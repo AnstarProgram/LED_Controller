@@ -57,10 +57,13 @@ public class BannerDiscovery {
                         sock.receive(p);
                         String s = new String(p.getData(), 0, p.getLength(), StandardCharsets.UTF_8);
                         if (!s.startsWith(MAGIC)) continue;
-                        String ip = kv(s, "ip="), name = kv(s, "name=");
-                        int port = Integer.parseInt(kv(s, "port="));
-                        if (ip.isEmpty()) ip = p.getAddress().getHostAddress();
-                        main.post(() -> cb.onFound(ip, port, name));
+                        final String fip = kv(s, "ip=").isEmpty()
+                                ? p.getAddress().getHostAddress() : kv(s, "ip=");
+                        final String fname = kv(s, "name=");
+                        final int fport;
+                        try { fport = Integer.parseInt(kv(s, "port=")); }
+                        catch (NumberFormatException e) { continue; }
+                        main.post(() -> cb.onFound(fip, fport, fname));
                     } catch (java.net.SocketTimeoutException e) {
                         // просто продолжаем слушать
                     }

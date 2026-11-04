@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- статус ленты -->
-    <TextView android:id="@+id/tvStatus"
+    <!-- панель вкладок -->
+    <LinearLayout android:id="@+id/tabs"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:padding="10dp" android:textSize="13sp" android:textColor="@color/muted"
-        android:background="@color/card"
-        android:text="@string/status_offline"/>
+        android:orientation="horizontal" android:background="@color/card">
+        <TextView android:id="@+id/tabEditor" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:padding="12dp" android:gravity="center"
+            android:textColor="@color/text" android:textSize="15sp" android:text="@string/tab_editor"/>
+        <TextView android:id="@+id/tabDevices" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:padding="12dp" android:gravity="center"
+            android:textColor="@color/text" android:textSize="15sp" android:text="@string/tab_devices"/>
+        <TextView android:id="@+id/tabFiles" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:padding="12dp" android:gravity="center"
+            android:textColor="@color/text" android:textSize="15sp" android:text="@string/tab_files"/>
+    </LinearLayout>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        app:tabMode="fixed" app:tabGravity="fill"/>
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/pager"
-        android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1"/>
+    <FrameLayout android:id="@+id/pager"
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
 </LinearLayout>

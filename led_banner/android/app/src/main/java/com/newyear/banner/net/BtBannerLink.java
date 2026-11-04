@@ -144,7 +144,7 @@ public class BtBannerLink {
         try { if (in != null) in.close(); } catch (Exception ignored) {}
         try { if (out != null) out.close(); } catch (Exception ignored) {}
         try { if (socket != null) socket.close(); } catch (Exception ignored) {}
-        in = out = null; socket = null;
+        in = null; out = null; socket = null;
     }
 
     private void postStatus(String m) {

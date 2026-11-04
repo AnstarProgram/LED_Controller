@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Вкладка «Ленты»: Wi-Fi список + ручная настройка + Bluetooth -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="12dp">
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/CardBox" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/dev_wifi_title" android:textStyle="bold"/>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/dev_auto_hint" android:textColor="@color/muted"
+                    android:textSize="13sp" android:layout_marginTop="4dp"/>
+                <LinearLayout android:id="@+id/deviceList" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="6dp"/>
+                <EditText android:id="@+id/etIp" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:hint="@string/hint_ip"
+                    android:inputType="textUri" android:layout_marginTop="6dp"/>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginTop="6dp">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnConnect" android:layout_width="0dp" android:layout_weight="1"
+                        android:layout_height="wrap_content" android:text="@string/btn_connect"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnScan" style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp" android:layout_weight="1" android:layout_marginStart="8dp"
+                        android:layout_height="wrap_content" android:text="@string/btn_scan"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/CardBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/dev_bt_title" android:textStyle="bold"/>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/dev_bt_hint" android:textColor="@color/muted"
+                    android:textSize="13sp" android:layout_marginTop="4dp"/>
+                <Spinner android:id="@+id/spBt" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="6dp"/>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginTop="6dp">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBtConnect" android:layout_width="0dp" android:layout_weight="1"
+                        android:layout_height="wrap_content" android:text="@string/btn_bt_connect"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBtDisconnect" style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="0dp" android:layout_weight="1" android:layout_marginStart="8dp"
+                        android:layout_height="wrap_content" android:text="@string/btn_bt_disconnect"/>
+                </LinearLayout>
+                <TextView android:id="@+id/tvBtState" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:textColor="@color/green"
+                    android:textSize="13sp" android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>
