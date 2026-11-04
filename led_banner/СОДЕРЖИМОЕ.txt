@@ -27,3 +27,14 @@ NYBanner v3.2 — новогодняя LED-лента (ESP32 + 3 панели 8x
 
 ЕСЛИ ЧТО-ТО НЕ ЗАПУСКАЕТСЯ: сначала пробуйте start.bat (ПК) или сайт esp32_web
 (управление лентой вообще без установки программ).
+
+
+=== V3.3 (ot 04.11.2026) ===
+ISPRAVLENO: bat-faily bolshe NI KOGDA ne zakryvayutsya sami - vsegda zhdayut klavishu
+i pishut polnyj zhurnal: pc_app/log_start.txt i pc_app/log_build.txt.
+Sborka EXE cherez "python -m PyInstaller" (bez zavisimosti ot PATH).
+Programma PC pri fatalnoj oshibke pokazyvaet okno s tekstom i pishet nybanner_error.log.
+Novye ssylki (onlyfiles, zhivut neskolko dnej):
+  vsy.777.zip : https://onlyfiles.com/wXw8wRo33Xja/vsy.777.zip
+  debug.apk   : https://onlyfiles.com/wDw2who73jaj/nybanner-debug.apk
+  release.apk : https://onlyfiles.com/wLw1wOoS30vL/nybanner-release.apk
