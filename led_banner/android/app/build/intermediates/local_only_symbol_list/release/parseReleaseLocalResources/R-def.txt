@@ -18,14 +18,18 @@ id btnConnect
 id btnDel
 id btnDown
 id btnDownload
+id btnOpenAccess
 id btnOpenPage
+id btnResetPanel
 id btnScan
 id btnSendFileToBanner
 id btnSendPl
+id btnSetPin
 id btnShowNow
 id btnUp
 id deviceList
 id etIp
+id etPin
 id etText
 id etUrl
 id lvFiles
@@ -47,6 +51,7 @@ id tabs
 id tvBtState
 id tvDlState
 id tvNum
+id tvPinState
 id tvText
 layout activity_main
 layout fragment_devices

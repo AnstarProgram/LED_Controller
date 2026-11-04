@@ -3209,10 +3209,13 @@ id btnConnect
 id btnDel
 id btnDown
 id btnDownload
+id btnOpenAccess
 id btnOpenPage
+id btnResetPanel
 id btnScan
 id btnSendFileToBanner
 id btnSendPl
+id btnSetPin
 id btnShowNow
 id btnUp
 id buttonPanel
@@ -3299,6 +3302,7 @@ id enterAlways
 id enterAlwaysCollapsed
 id escape
 id etIp
+id etPin
 id etText
 id etUrl
 id exitUntilCollapsed
@@ -3619,6 +3623,7 @@ id triangle
 id tvBtState
 id tvDlState
 id tvNum
+id tvPinState
 id tvText
 id unchecked
 id uniform

@@ -33,7 +33,16 @@ public final class FragmentDevicesBinding implements ViewBinding {
   public final MaterialButton btnConnect;
 
   @NonNull
+  public final MaterialButton btnOpenAccess;
+
+  @NonNull
+  public final MaterialButton btnResetPanel;
+
+  @NonNull
   public final MaterialButton btnScan;
+
+  @NonNull
+  public final MaterialButton btnSetPin;
 
   @NonNull
   public final LinearLayout deviceList;
@@ -42,24 +51,37 @@ public final class FragmentDevicesBinding implements ViewBinding {
   public final EditText etIp;
 
   @NonNull
+  public final EditText etPin;
+
+  @NonNull
   public final Spinner spBt;
 
   @NonNull
   public final TextView tvBtState;
 
+  @NonNull
+  public final TextView tvPinState;
+
   private FragmentDevicesBinding(@NonNull ScrollView rootView, @NonNull MaterialButton btnBtConnect,
       @NonNull MaterialButton btnBtDisconnect, @NonNull MaterialButton btnConnect,
-      @NonNull MaterialButton btnScan, @NonNull LinearLayout deviceList, @NonNull EditText etIp,
-      @NonNull Spinner spBt, @NonNull TextView tvBtState) {
+      @NonNull MaterialButton btnOpenAccess, @NonNull MaterialButton btnResetPanel,
+      @NonNull MaterialButton btnScan, @NonNull MaterialButton btnSetPin,
+      @NonNull LinearLayout deviceList, @NonNull EditText etIp, @NonNull EditText etPin,
+      @NonNull Spinner spBt, @NonNull TextView tvBtState, @NonNull TextView tvPinState) {
     this.rootView = rootView;
     this.btnBtConnect = btnBtConnect;
     this.btnBtDisconnect = btnBtDisconnect;
     this.btnConnect = btnConnect;
+    this.btnOpenAccess = btnOpenAccess;
+    this.btnResetPanel = btnResetPanel;
     this.btnScan = btnScan;
+    this.btnSetPin = btnSetPin;
     this.deviceList = deviceList;
     this.etIp = etIp;
+    this.etPin = etPin;
     this.spBt = spBt;
     this.tvBtState = tvBtState;
+    this.tvPinState = tvPinState;
   }
 
   @Override
@@ -107,9 +129,27 @@ public final class FragmentDevicesBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnOpenAccess;
+      MaterialButton btnOpenAccess = ViewBindings.findChildViewById(rootView, id);
+      if (btnOpenAccess == null) {
+        break missingId;
+      }
+
+      id = R.id.btnResetPanel;
+      MaterialButton btnResetPanel = ViewBindings.findChildViewById(rootView, id);
+      if (btnResetPanel == null) {
+        break missingId;
+      }
+
       id = R.id.btnScan;
       MaterialButton btnScan = ViewBindings.findChildViewById(rootView, id);
       if (btnScan == null) {
+        break missingId;
+      }
+
+      id = R.id.btnSetPin;
+      MaterialButton btnSetPin = ViewBindings.findChildViewById(rootView, id);
+      if (btnSetPin == null) {
         break missingId;
       }
 
@@ -125,6 +165,12 @@ public final class FragmentDevicesBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.etPin;
+      EditText etPin = ViewBindings.findChildViewById(rootView, id);
+      if (etPin == null) {
+        break missingId;
+      }
+
       id = R.id.spBt;
       Spinner spBt = ViewBindings.findChildViewById(rootView, id);
       if (spBt == null) {
@@ -137,8 +183,15 @@ public final class FragmentDevicesBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvPinState;
+      TextView tvPinState = ViewBindings.findChildViewById(rootView, id);
+      if (tvPinState == null) {
+        break missingId;
+      }
+
       return new FragmentDevicesBinding((ScrollView) rootView, btnBtConnect, btnBtDisconnect,
-          btnConnect, btnScan, deviceList, etIp, spBt, tvBtState);
+          btnConnect, btnOpenAccess, btnResetPanel, btnScan, btnSetPin, deviceList, etIp, etPin,
+          spBt, tvBtState, tvPinState);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

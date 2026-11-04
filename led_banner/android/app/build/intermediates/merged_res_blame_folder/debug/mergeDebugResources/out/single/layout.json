@@ -1,22 +1,26 @@
 [
     {
-        "merged": "com.newyear.banner.app-mergeDebugResources-32:/layout/fragment_files.xml",
-        "source": "com.newyear.banner.app-main-35:/layout/fragment_files.xml"
-    },
-    {
-        "merged": "com.newyear.banner.app-mergeDebugResources-32:/layout/activity_main.xml",
-        "source": "com.newyear.banner.app-main-35:/layout/activity_main.xml"
-    },
-    {
-        "merged": "com.newyear.banner.app-mergeDebugResources-32:/layout/fragment_editor.xml",
-        "source": "com.newyear.banner.app-main-35:/layout/fragment_editor.xml"
-    },
-    {
         "merged": "com.newyear.banner.app-mergeDebugResources-32:/layout/fragment_devices.xml",
         "source": "com.newyear.banner.app-main-35:/layout/fragment_devices.xml"
     },
     {
-        "merged": "com.newyear.banner.app-mergeDebugResources-32:/layout/item_queue.xml",
-        "source": "com.newyear.banner.app-main-35:/layout/item_queue.xml"
+        "merged": "/root/.gradle/daemon/8.7/com.newyear.banner.app-mergeDebugResources-32:/layout/fragment_files.xml",
+        "source": "/root/.gradle/daemon/8.7/com.newyear.banner.app-main-35:/layout/fragment_files.xml"
+    },
+    {
+        "merged": "/root/.gradle/daemon/8.7/com.newyear.banner.app-mergeDebugResources-32:/layout/fragment_devices.xml",
+        "source": "/root/.gradle/daemon/8.7/com.newyear.banner.app-main-35:/layout/fragment_devices.xml"
+    },
+    {
+        "merged": "/root/.gradle/daemon/8.7/com.newyear.banner.app-mergeDebugResources-32:/layout/fragment_editor.xml",
+        "source": "/root/.gradle/daemon/8.7/com.newyear.banner.app-main-35:/layout/fragment_editor.xml"
+    },
+    {
+        "merged": "/root/.gradle/daemon/8.7/com.newyear.banner.app-mergeDebugResources-32:/layout/item_queue.xml",
+        "source": "/root/.gradle/daemon/8.7/com.newyear.banner.app-main-35:/layout/item_queue.xml"
+    },
+    {
+        "merged": "/root/.gradle/daemon/8.7/com.newyear.banner.app-mergeDebugResources-32:/layout/activity_main.xml",
+        "source": "/root/.gradle/daemon/8.7/com.newyear.banner.app-main-35:/layout/activity_main.xml"
     }
 ]
