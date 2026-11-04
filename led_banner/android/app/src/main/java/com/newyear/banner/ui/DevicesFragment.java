@@ -37,6 +37,8 @@ public class DevicesFragment extends Fragment {
     private LinearLayout deviceList;
     private Spinner spBt;
     private TextView tvBtState;
+    private EditText etPin;
+    private TextView tvPinState;
     private BtBannerLink bt;
 
     @Nullable @Override
@@ -54,6 +56,12 @@ public class DevicesFragment extends Fragment {
         Button btnScan = v.findViewById(R.id.btnScan);
         Button btnBtC = v.findViewById(R.id.btnBtConnect);
         Button btnBtD = v.findViewById(R.id.btnBtDisconnect);
+        etPin = v.findViewById(R.id.etPin);
+        tvPinState = v.findViewById(R.id.tvPinState);
+        v.findViewById(R.id.btnSetPin).setOnClickListener(x -> setPin(etPin.getText().toString().trim()));
+        v.findViewById(R.id.btnOpenAccess).setOnClickListener(x -> { etPin.setText("0000"); setPin("0000"); });
+        v.findViewById(R.id.btnResetPanel).setOnClickListener(x -> sendCmd("RESET"));
+        refreshPinState();
 
         String last = App.get().client.getHost();
         if (!last.isEmpty()) etIp.setText(last);
@@ -155,6 +163,38 @@ public class DevicesFragment extends Fragment {
             }
             @Override public void onError(Exception e) {
                 post(() -> toast(getString(R.string.status_offline) + ": " + e.getMessage()));
+            }
+        });
+    }
+
+    /** Задать PIN ленты: 0000 = вход без пароля (открытый доступ). */
+    private void setPin(String code) {
+        if (code.length() != 4 || !code.matches("\\d{4}")) { toast("PIN — ровно 4 цифры"); return; }
+        sendCmd("PIN " + code);
+    }
+
+    private void sendCmd(String cmd) {
+        App.get().client.command(cmd, new BannerClient.Cb() {
+            @Override public void onResult(String body) {
+                post(() -> { toast(cmd + " ⇒ " + body); refreshPinState(); });
+            }
+            @Override public void onError(Exception e) {
+                post(() -> toast(getString(R.string.status_offline) + ": " + e.getMessage()));
+            }
+        });
+    }
+
+    /** Показать текущий режим доступа ленты из /api/status. */
+    private void refreshPinState() {
+        App.get().client.status(new BannerClient.Cb() {
+            @Override public void onResult(String body) {
+                boolean open = body.contains("\"open\":true");
+                post(() -> tvPinState.setText(open
+                        ? "🔓 Сейчас лента ОТКРЫТА — вход без PIN-кода"
+                        : "🔒 Лента защищена PIN-кодом"));
+            }
+            @Override public void onError(Exception e) {
+                post(() -> tvPinState.setText("Лента не отвечает — проверьте подключение"));
             }
         });
     }
