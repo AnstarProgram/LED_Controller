@@ -15,7 +15,7 @@ up() { # $1 = файл -> печать прямой ссылки
   local raw
   raw=$(curl -sS -F "file=@$f" https://tmpfiles.org/api/v1/upload)
   # отдаём страницу-обёртку (кнопка Download) — прямой /download/ удаляет файл сразу
-  echo "$raw" | grep -o 'https://tmpfiles.org/[0-9]*/[^"]*' | sed 's|tmpfiles.org/|tmpfiles.org/download/|'
+  echo "$raw" | grep -o 'https://tmpfiles.org/[^"]*'
 }
 
 echo "// ---- блок для вставки в index.html (свежие, живут ~1 час) ----"
