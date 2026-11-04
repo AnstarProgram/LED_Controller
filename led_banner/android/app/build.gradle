@@ -17,13 +17,12 @@ android {
 
     signingConfigs {
         release {
-            // Ключ для публикации в RuStore создайте сами:
+            // Для RuStore создайте СВОЙ ключ (этот — временный, для проверки сборки):
             //   keytool -genkey -v -keystore nybanner.keystore -alias nybanner -keyalg RSA -keysize 2048 -validity 10000
-            // и раскомментируйте строки ниже (пароли лучше через gradle.properties / env)
-            // storeFile file("../nybanner.keystore")
-            // storePassword System.getenv("KS_PASS")
-            // keyAlias "nybanner"
-            // keyPassword System.getenv("KEY_PASS")
+            storeFile file("../nybanner-release.keystore")
+            storePassword System.getenv("KS_PASS") ?: "nybanner123"
+            keyAlias "nybanner"
+            keyPassword System.getenv("KEY_PASS") ?: "nybanner123"
         }
     }
 
@@ -31,7 +30,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // signingConfig signingConfigs.release  // включите после создания ключа RuStore
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
