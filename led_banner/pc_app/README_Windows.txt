@@ -1,29 +1,27 @@
-NYBanner PC — сборка на Windows (v3.2)
-======================================
+NYBanner PC - INSTRUKCIYA (v3.3)
 
-ПРАВИЛЬНЫЙ ПОРЯДОК:
-1) Распакуйте архив, скопируйте папку pc_app в F:\pc_app
-   (должны получиться файлы F:\pc_app\nybanner_pc.py и F:\pc_app\build_exe.bat).
-2) Двойной клик по build_exe.bat — он сам всё проверит и соберёт
-   F:\pc_app\NYBanner_PC.exe (первый запуск занимает 1-3 минуты).
+POCHEMU OKNO ZAKRIVALOS I CTO ISPRAVLENO:
+- start.bat i build_exe.bat teper VSEGDA zhdayut natiatiya klavishi (pause)
+  i pishut polnyj zhurnal v fail ryadom: log_start.txt / log_build.txt.
+- Esli programa za-pushaetsya i srazu zakryvaetsya - otkroyte
+  nybanner_error.log (sozdaetsya avtomaticheski) - tam tochka sboya.
+- Sborka EXE bolshe ne zavisit ot PATH: bat vyzyvaet
+  "python -m PyInstaller" napryamuyu.
 
-ЕСЛИ ОШИБКА "pyinstaller не является внутренней или внешней командой":
-Это исправлено в версии v3.2 — теперь скрипт вызывает PyInstaller
-как модуль Python (python -m PyInstaller), а не как отдельную команду,
-поэтому папка ...\Roaming\Python\Scripts\ больше НЕ обязана быть в PATH.
-Просто возьмите НОВЫЙ build_exe.bat из этого архива и запустите снова.
+BYSTRYJ START (bez sborki EXE):
+1. Rasarkhivayte arkhiv, papku pc_app peremestite v F:\pc_app
+2. Dvojnoy klik start.bat  -> otkroetsya programa NYBanner PC.
+   (Nuzhen Python 3.9-3.13 s https://python.org, galochka
+    "Add python.exe to PATH" pri ustanovke.)
+3. Hotite odin fayl NYBanner_PC.exe? Dvojnoy klik build_exe.bat,
+   zhdajte 1-3 minuty, rezultat v F:\pc_app\NYBanner_PC.exe
 
-ЗАПАСНОЙ ВАРИАНТ (без сборки exe вообще):
-Двойной клик по start.bat — программа откроется сразу через Python.
-Это полноценный режим работы, exe нужен только для удобства.
+YESLI PYTHOON 3.14 NA WINDOWS 7/8:
+PyInstaller na 3.14 trebuyet Windows 10+. Postavte Python 3.12
+(papkoy eshe odnoy versiyey on ne мешается) ili polzuites
+start.bat / saytom esp32_web (vse funkcii v brauzere).
 
-ЕСЛИ Windows 7/8/8.1 и падает с ошибкой api-ms-win-core-path-l1-1-0.dll:
-Python 3.14 такие старые системы не поддерживает. Варианты:
-  a) установить Python 3.9.x (у него есть поддержка Win7) и запустить build_exe.bat;
-  b) использовать start.bat (программа пойдёт и на 3.14 без tkinter-ограничений? нет —
-     tkinter есть всегда, но если окно не открывается — обновите драйвер видео);
-  c) управлять лентой через сайт esp32_web/index.html — там тот же функционал,
-     ничего устанавливать не надо.
-
-Проверка установленного PyInstaller вручную (cmd):
-  python -m PyInstaller --version   ->  должен показать 6.x
+SKACHAT S VEBA (zerkalo onlyfiles.com, est reklama):
+APK telefona: https://onlyfiles.com/wuwFwTon3fXs/nybanner-debug.apk
+Release APK : https://onlyfiles.com/wbwjwIo93ebb/nybanner-release.apk
+Arkhiv      : (obnovlyaetsya skriptom site/make_mirror_links.sh)

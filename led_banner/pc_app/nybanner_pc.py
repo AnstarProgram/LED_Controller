@@ -14,6 +14,8 @@ NYBanner PC — приложение для управления новогод�
 
 Собрать EXE:  pyinstaller --noconsole --onefile --name NYBanner nybanner_pc.py
 """
+import os
+import sys
 import json
 import socket
 import threading
@@ -655,6 +657,33 @@ class App(tk.Tk):
         self.destroy()
 
 
+def _crash_log(exc):
+    """Пишем любую фатальную ошибку в nybanner_error.log рядом с программой."""
+    try:
+        import traceback, datetime, sys
+        base = os.path.dirname(os.path.abspath(sys.argv[0]))
+        p = os.path.join(base, "nybanner_error.log")
+        with open(p, "a", encoding="utf-8") as f:
+            f.write("\n===== %s =====\n" % datetime.datetime.now())
+            traceback.print_exc(file=f)
+        try:
+            import tkinter.messagebox as mb
+            r = tk.Tk(); r.withdraw()
+            mb.showerror("NYBanner PC - oshibka",
+                         "Programma upala. Tekst oshibki sohranen v:\n" + p)
+            r.destroy()
+        except Exception:
+            pass
+    except Exception:
+        pass
+
+
 if __name__ == "__main__":
-    app = App()
-    app.mainloop()
+    try:
+        app = App()
+        app.mainloop()
+    except SystemExit:
+        raise
+    except BaseException as e:
+        _crash_log(e)
+        raise
