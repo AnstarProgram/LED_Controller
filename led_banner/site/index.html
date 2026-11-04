@@ -50,6 +50,7 @@ code{background:#0d1330;padding:2px 6px;border-radius:6px;color:var(--acc)}
       <h2>🔧 Прошивка ESP32</h2>
       Буфер 5 минут, автозапрос данных за 5 сек, мини-редактор в браузере, Bluetooth «NY-BANNER».
       <br><a class="btn b2" id="dl-fw" href="#">Скачать прошивку (.zip)</a>
+      <br><a class="btn b1" id="dl-panel" href="#">🎛 Открыть панель управления (сайт v2)</a>
     </div>
   </div>
   <div class="card">
@@ -82,7 +83,7 @@ const MIRROR = {
   apk:      "https://onlyfiles.com/wnwvwVonvHOK/nybanner-debug.apk",    // приложение для телефона
   release:  "https://onlyfiles.com/wYwFwnoIvNDC/nybanner-release.apk",  // подписанный релиз (RuStore)
   exe:      "", /* .exe ещё не собран — сгенерируйте и вставьте сюда */
-  firmware: "https://onlyfiles.com/wUw0w8otv0FQ/vsy.222.zip"  // весь проект + прошивка
+  firmware: "" /* заполнит make_mirror_links.sh после загрузки vsy.444.zip */  // весь проект + прошивка
 };
 
 // Если GitHub ещё не настроен (логин не заменён) — основные кнопки
@@ -98,6 +99,8 @@ document.getElementById('dl-pc').href  = ghReady ? base + 'NYBanner-PC.zip' : (M
 document.getElementById('dl-fw').href  = ghReady ? base + 'firmware.zip' : MIRROR.firmware;
 document.getElementById('dl-apk-alt').href = MIRROR.release || MIRROR.apk;
 document.getElementById('dl-pc-alt').href  = MIRROR.exe ? MIRROR.exe : MIRROR.firmware;
+document.getElementById('dl-panel').href = (location.protocol==='file:' ? 'esp32_web/index.html' : 'http://' + (localStorage.nyb_ip || '') + ':8765');
+if(!MIRROR.firmware){ document.getElementById('dl-fw').href='github/KAK_ZALIT_APK.md'; }
 document.getElementById('ghlink').href = `https://github.com/${REPO}`;
 </script>
 <p style="text-align:center;color:#8aa;font-size:13px;margin-top:14px">
