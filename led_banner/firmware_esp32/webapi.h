@@ -148,6 +148,12 @@ static void handleStream() {
   c.stop();
 }
 
+static void handleWifi() {
+  String body = server.arg("plain");           // "ssid|пароль"
+  btRunCommand("WIFI:" + body);
+  server.send(200, "text/plain", "wifi saved, reconnecting");
+}
+
 static void handleConfig() {
   server.send(200, "application/json",
     "{\"fw\":\"ny-banner-esp32\",\"rows\":8,\"cols\":" + String(gBanner.w()) +
@@ -163,6 +169,7 @@ void webSetup() {
   server.on("/api/status", HTTP_GET, handleStatus);
   server.on("/api/config", HTTP_GET, handleConfig);
   server.on("/stream", HTTP_GET, handleStream);
+  server.on("/api/wifi", HTTP_POST, handleWifi);
   server.begin();
 }
 

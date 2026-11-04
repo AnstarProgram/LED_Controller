@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NYBanner — новогодняя LED-лента для школы</title>
+<style>
+:root{--bg:#0b1020;--card:#151a30;--acc:#4fd1ff;--grn:#3ddc84}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:#e8ecff}
+header{text-align:center;padding:48px 16px 24px}
+h1{font-size:34px;margin:0}.snow{color:#9fd0ff}
+.sub{color:#aab4d8;margin-top:8px}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:24px 0}
+.card{background:var(--card);border:1px solid #2a3158;border-radius:16px;padding:22px}
+.card h2{margin:0 0 6px;font-size:20px}
+.badge{display:inline-block;font-size:12px;color:#0b1020;background:var(--grn);border-radius:8px;padding:2px 8px;margin-bottom:8px}
+.btn{display:inline-block;margin-top:12px;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700}
+.b1{background:var(--grn);color:#04130a}.b2{background:var(--acc);color:#04101f}.b3{background:#d9822f;color:#1c0f00}
+ul{line-height:1.7;color:#c8d2f5}
+footer{text-align:center;color:#66719b;padding:28px;font-size:13px}
+code{background:#0d1330;padding:2px 6px;border-radius:6px;color:var(--acc)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎄 NYBanner <span class="snow">❄</span></h1>
+  <div class="sub">Новогодняя бегущая LED-лента на ESP32 + панели 8×32.<br>
+  Текст, гирлянда, радуга, снег — с телефона или компьютера, без пайки и программирования.</div>
+</header>
+<div class="wrap">
+  <div class="cards">
+    <div class="card">
+      <div class="badge">Android 5.0+</div>
+      <h2>📱 Приложение для телефона</h2>
+      Мини-редактор, живое превью 1:1, подключение ленты по Wi-Fi и Bluetooth.
+      <br><a class="btn b1" id="dl-apk" href="#">Скачать APK</a>
+      <br><a class="btn b3" href="https://apps.rustore.ru/">RuStore (скоро)</a>
+    </div>
+    <div class="card">
+      <div class="badge">Windows 10/11</div>
+      <h2>💻 Программа для ПК</h2>
+      Три режима: блоки как в Scratch, простой редактор текста и прямой ввод кода. Настройка Wi-Fi ленты.
+      <br><a class="btn b2" id="dl-pc" href="#">Скачать NYBanner.exe</a>
+    </div>
+    <div class="card">
+      <div class="badge">Arduino IDE</div>
+      <h2>🔧 Прошивка ESP32</h2>
+      Буфер 5 минут, автозапрос данных за 5 сек, мини-редактор в браузере, Bluetooth «NY-BANNER».
+      <br><a class="btn b2" id="dl-fw" href="#">Скачать прошивку (.zip)</a>
+    </div>
+  </div>
+  <div class="card">
+    <h2>⚡ Быстрый старт</h2>
+    <ul>
+      <li>Зашейте прошивку в ESP32 (Arduino IDE, плата «ESP32 Dev Module»).</li>
+      <li>Откройте в браузере <code>http://IP-ленты:8765</code> — IP виден в мониторе порта после включения.</li>
+      <li>Или установите приложение: оно само найдёт ленту в сети кнопкой «Найти авто».</li>
+      <li>Напишите текст → «Показать» → лента поздравляет. Готово!</li>
+    </ul>
+  </div>
+</div>
+<footer>NYBanner v2.0 · сделано к Новому 2027 году ✨ · <a style="color:#4fd1ff" id="ghlink" href="#">GitHub проекта</a></footer>
+<script>
+// <<< ЗАМЕНИТЕ на свой GitHub: логин и имя репозитория >>>
+const REPO = "ВАШ_ЛОГИН/nybanner";
+const TAG  = "latest"; // latest — всегда последняя версия
+const base = `https://github.com/${REPO}/releases/${TAG}/download/`;
+document.getElementById('dl-apk').href = base + 'NYBanner.apk';
+document.getElementById('dl-pc').href  = base + 'NYBanner-PC.zip';
+document.getElementById('dl-fw').href  = base + 'firmware.zip';
+document.getElementById('ghlink').href = `https://github.com/${REPO}`;
+</script>
+</body>
+</html>

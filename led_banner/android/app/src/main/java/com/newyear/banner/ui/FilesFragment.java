@@ -52,6 +52,7 @@ public class FilesFragment extends Fragment {
         Button btnDown = v.findViewById(R.id.btnDownload);
         Button btnSend = v.findViewById(R.id.btnSendFileToBanner);
 
+        etUrl.setText("https://github.com/ВАШ_ЛОГИН/nybanner/releases");
         dl = new SiteDownloader(requireContext());
         lvFiles.setAdapter(new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1, names));

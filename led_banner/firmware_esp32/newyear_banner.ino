@@ -45,7 +45,10 @@ uint8_t    gEffect = 1;          // эффект по умолчанию — г�
 bool       gAutonomous = true;   // ленте не нужен ПК, пока сам не попросит данные
 
 // Адрес ПК-приложения (для стрим-режима). Можно менять через BT/веб.
-static String gPcUrl = "http://192.168.1.100:8765";
+String gPcUrl = "http://192.168.1.100:8765";
+
+#include <WiFiUdp.h>
+static WiFiUDP gUdp;               // автопоиск ленты приложениями (порт 8766)
 
 // --------------------------- служебные экраны -------------------------------
 static void splash(const String& line1) {
@@ -73,38 +76,50 @@ static void blinkError() {
 
 // -------------------- запрос новых кадров у ПК по Wi-Fi ---------------------
 // Формат ответа /stream: заголовок X-Frames + сырые кадры framePx байт каждый.
+static bool pullReadFrames(WiFiClient& cli) {
+  // читаем заголовки до пустой строки, ловим X-Frames
+  int frames = -1; String line; uint32_t t0 = millis();
+  while (cli.connected() && millis() - t0 < 10000) {
+    if (!cli.available()) { delay(2); continue; }
+    char ch = cli.read();
+    if (ch == '\n') {
+      if (line.endsWith("\r")) line.remove(line.length() - 1);
+      if (line.isEmpty()) break;
+      if (line.startsWith("X-Frames:")) frames = line.substring(9).toInt();
+      line = "";
+    } else line += ch;
+  }
+  if (frames <= 0) return false;
+  std::unique_ptr<uint8_t[]> buf(new uint8_t[gRB.framePx]);
+  int got = 0; t0 = millis();
+  while (got < frames && cli.connected() && millis() - t0 < FETCH_TIMEOUT_MS) {
+    size_t need = gRB.framePx, off = 0;
+    while (need && cli.connected()) {
+      int r = cli.readBytes((char*)buf.get() + off, need);
+      if (r <= 0) break;
+      off += r; need -= r;
+    }
+    if (need) break;
+    gRB.appendFrame(buf.get()); got++;
+  }
+  return got > 0;
+}
+
 static bool pullFromPC(int seconds) {
   if (WiFi.status() != WL_CONNECTED) return false;
-  HTTPClient http;
-  String url = gPcUrl + "/stream?sec=" + String(seconds);
-  http.begin(url);
-  http.setTimeout(FETCH_TIMEOUT_MS);
-  int code = http.GET();
-  if (code != 200) { http.end(); return false; }
-  WiFiClient* c = http.getStreamPtr();
-  int frames = http.header("X-Frames").toInt();
-  if (frames <= 0) { http.end(); return false; }
-  std::unique_ptr<uint8_t[]> buf(new uint8_t[gRB.framePx]);
-  int got = 0;
-  while (got < frames && c->connected()) {
-    size_t avail = c->available();
-    if (!avail) { delay(2); continue; }
-    // читаем кадр по частям
-    size_t need = gRB.framePx;
-    bool okAll = true;
-    while (need) {
-      size_t a = c->available();
-      if (!a) { vTaskDelay(2); continue; }
-      size_t r = c->readBytes(buf.get() + (gRB.framePx - need), min(a, need));
-      if (!r) { okAll = false; break; }
-      need -= r;
-    }
-    if (!okAll) break;
-    gRB.appendFrame(buf.get());
-    got++;
-  }
-  http.end();
-  return got > 0;
+  String u = gPcUrl; u.trim();
+  if (u.startsWith("http://")) u = u.substring(7);
+  int sl = u.indexOf('/'); if (sl >= 0) u = u.substring(0, sl);
+  String host = u; uint16_t port = 80;
+  int cp = u.indexOf(':');
+  if (cp >= 0) { host = u.substring(0, cp); port = u.substring(cp + 1).toInt(); }
+  WiFiClient cli;
+  if (!cli.connect(host.c_str(), port, 3000)) return false;
+  cli.print(String("GET /stream?sec=") + String(seconds) +
+            " HTTP/1.1\r\nHost: esp32\r\nConnection: close\r\n\r\n");
+  bool ok = pullReadFrames(cli);
+  cli.stop();
+  return ok;
 }
 
 // -------------------------------- setup ------------------------------------
@@ -114,6 +129,11 @@ void setup() {
   Serial.println("\n== NY-BANNER ESP32 start ==");
 
   LittleFS.begin(true);
+  prefsSetup();
+  // сохранённые из приложения настройки имеют приоритет над config.h
+  String ssid = gPrefs.getString("ssid", WIFI_SSID);
+  String pass = gPrefs.getString("pass", WIFI_PASS);
+  gPcUrl      = gPrefs.getString("pcurl", gPcUrl);
   gPL.load();
   if (gPL.items.empty()) {                       // первый запуск — приветствие
     gPL.add("SCHOLA POZDRAVLAET", 1, 2);
@@ -131,12 +151,13 @@ void setup() {
   gFeeder.begin(&gRB, &gPL, gBanner.w(), gBanner.h());
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  splash(String("WiFi: ") + WIFI_SSID);
+  WiFi.begin(ssid.c_str(), pass.c_str());
+  splash(String("WiFi: ") + ssid);
   uint32_t t0 = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - t0 < 20000) delay(200);
   webSetup();                                    // мини-редактор доступен всегда
   btSetup();                                     // Bluetooth даже без Wi-Fi
+  gUdp.begin(8766);                              // UDP-ответ на «Найти авто»
 
   if (WiFi.status() == WL_CONNECTED) {
     Serial.print("IP: "); Serial.println(WiFi.localIP().toString());
@@ -186,4 +207,18 @@ void loop() {
   // 3) Веб-редактор и Bluetooth
   webLoop();
   btLoop();
+
+  // 4) Автопоиск приложениями: «NYB_DISCOVER» -> отвечаем своим IP
+  {
+    int ps = gUdp.parsePacket();
+    if (ps > 0) {
+      char buf[32] = {0};
+      gUdp.read(buf, sizeof(buf) - 1);
+      if (String(buf).startsWith("NYB_DISCOVER")) {
+        gUdp.beginPacket(gUdp.remoteIP(), gUdp.remotePort());
+        gUdp.print("NYB@"); gUdp.print(WiFi.localIP().toString());
+        gUdp.endPacket();
+      }
+    }
+  }
 }

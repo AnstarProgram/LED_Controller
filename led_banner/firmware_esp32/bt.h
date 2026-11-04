@@ -15,6 +15,7 @@
 #pragma once
 #include <Arduino.h>
 #include <WiFi.h>
+#include <Preferences.h>
 #include <BluetoothSerial.h>   // Classic SPP (есть в пакете esp32 для Arduino)
 
 extern RingBuffer gRB;
@@ -22,6 +23,13 @@ extern Playlist   gPL;
 extern Feeder     gFeeder;
 extern Banner     gBanner;
 extern uint8_t    gEffect;
+extern String     gPcUrl;      // адрес ПК-приложения (стрим-режим), определён в .ino
+
+static Preferences gPrefs;     // энергонезависимое хранение Wi-Fi/URL настроек
+
+void prefsSetup() {
+  gPrefs.begin("nybanner", false);
+}
 
 static BluetoothSerial SerialBT;
 static String btLine;
@@ -62,6 +70,36 @@ void btRunCommand(String cmd) {
     gBanner.setBrightness(constrain(cmd.substring(7).toInt(), 0, 255)); SerialBT.println("OK");
   } else if (cmd == "CLEAR") {
     gPL.clearAll(); gPL.save(); SerialBT.println("OK");
+  } else if (cmd.startsWith("WIFI:")) {
+    // WIFI:имя|пароль — сохранить и переподключиться (из ПК/Android приложения)
+    String v = cmd.substring(5);
+    int p = v.indexOf('|');
+    String ssid = (p >= 0) ? v.substring(0, p) : v;
+    String pass = (p >= 0) ? v.substring(p + 1) : "";
+    ssid.trim(); pass.trim();
+    gPrefs.putString("ssid", ssid); gPrefs.putString("pass", pass);
+    SerialBT.println("OK-SAVE-WIFI");
+    WiFi.disconnect(); WiFi.begin(ssid.c_str(), pass.c_str());
+  } else if (cmd.startsWith("PCURL:")) {
+    gPcUrl = cmd.substring(6); gPcUrl.trim();
+    gPrefs.putString("pcurl", gPcUrl);
+    SerialBT.println("OK-PCURL");
+  } else if (cmd.startsWith("FX:")) {
+    // FX:salute | FX:snow | FX:tree — новогодние эффекты из блоков Scratch
+    String f = cmd.substring(3); f.trim(); f.toLowerCase();
+    const char* txt = NULL; uint8_t eff = 2;
+    if (f == "salute") { txt = "S NOVYM GODOM!"; eff = 2; }
+    else if (f == "snow")  { txt = "SNEG SNESHKII SNESHKII"; eff = 3; }
+    else if (f == "tree")  { txt = "YOLKA LES ELOCHKA"; eff = 1; }
+    if (txt) {
+      gPL.clearAll(); gPL.add(txt, eff, 2);
+      gRB.reset();
+      gFeeder.itemIdx = 0; gFeeder.scroll = 0; gFeeder.pauseFrames = 0;
+      gFeeder.refillNow(gRB.cap / 2);
+      SerialBT.println("OK-FX");
+    } else SerialBT.println("ERR: unknown fx");
+  } else if (cmd == "REBOOT") {
+    SerialBT.println("BYE"); delay(200); ESP.restart();
   } else if (cmd == "SAVE") {
     SerialBT.println(gPL.save() ? "OK" : "ERR");
   } else if (cmd == "STATUS") {
