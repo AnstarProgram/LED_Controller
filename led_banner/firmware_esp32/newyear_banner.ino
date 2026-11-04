@@ -33,8 +33,8 @@
 #include "banner.h"
 #include "playlist.h"
 #include "feeder.h"
+#include "bt.h"      // + scratchvm.h внутри: Scratch-программы и PIN-спаривание
 #include "webapi.h"
-#include "bt.h"
 
 // ------------------------------ глобальные объекты --------------------------
 RingBuffer gRB;
@@ -164,6 +164,16 @@ void setup() {
     splash("WiFi OK");
   } else splash("WiFi NET");
 
+  // ---- ПЕРВОЕ ВКЛЮЧЕНИЕ: показываем PIN-код на панелях + AP «NY-BANNER-SETUP».
+  // Приложение (сайт/Android/ПК) подключается и вводит код — только после
+  // этого панель «привязана» и работает штатно. Кнопка «Сбросить панель»
+  // в приложениях возвращает сюда же (команда ISCRATCH).
+  bool paired = gPrefs.getBool("paired", false);
+  if (!paired) { pairEnter(); }
+
+  // Если в памяти ленты лежит Scratch-программа — сразу запускаем её.
+  if (gScratch.loadProg()) { gScratch.running = true; gScratch.restart(); }
+
   // Наполняем эфир на несколько минут вперёд ДО выхода на панель
   gFeeder.refillNow(gRB.cap / 2);
 }
@@ -204,11 +214,17 @@ void loop() {
     }
   }
 
-  // 3) Веб-редактор и Bluetooth
+  // 3) Scratch-программа ленты (исполняется сама, без ПК)
+  if (gScratch.running) gScratch.tick();
+
+  // 4) Режим привязки (PIN-код) — свой мини-вебсервер
+  pairLoop();
+
+  // 5) Веб-редактор и Bluetooth
   webLoop();
   btLoop();
 
-  // 4) Автопоиск приложениями: «NYB_DISCOVER» -> отвечаем своим IP
+  // 6) Автопоиск приложениями: «NYB_DISCOVER» -> отвечаем своим IP
   {
     int ps = gUdp.parsePacket();
     if (ps > 0) {

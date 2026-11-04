@@ -22,7 +22,7 @@ from tkinter import ttk, filedialog, messagebox
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-APP_VERSION = "2.0"
+APP_VERSION = "3.0"
 DEFAULT_IP = ""            # пусто = искать автоматически
 API_PORT = 8765            # порт веб-API прошивки (HTTP_PORT в config.h)
 SITE_URL = "https://github.com/ВАШ_ЛОГИН/nybanner/releases"  # <<< впишите ваш GitHub-логин
@@ -55,6 +55,42 @@ class BannerLink:
 
     def status(self, timeout=3):
         req = Request(self._url("/api/status"))
+        with urllib_timeout(req, timeout) as r:
+            return r.read().decode("utf-8", "replace").strip()
+
+    def send_prg(self, blocks_json, timeout=6):
+        """POST /api/prg — загрузить Scratch-программу в память ленты и запустить."""
+        body = blocks_json.encode("utf-8")
+        req = Request(self._url("/api/prg"), data=body,
+                      headers={"Content-Type": "application/json"}, method="POST")
+        with urllib_timeout(req, timeout) as r:
+            return r.read().decode("utf-8", "replace").strip()
+
+    def get_prg(self, timeout=5):
+        req = Request(self._url("/api/prg"))
+        with urllib_timeout(req, timeout) as r:
+            return r.read().decode("utf-8", "replace").strip()
+
+    def run_prg(self, timeout=4):
+        req = Request(self._url("/api/run"), data=b"", method="POST")
+        with urllib_timeout(req, timeout) as r:
+            return r.read().decode("utf-8", "replace").strip()
+
+    def stop_prg(self, timeout=4):
+        req = Request(self._url("/api/stop"), data=b"", method="POST")
+        with urllib_timeout(req, timeout) as r:
+            return r.read().decode("utf-8", "replace").strip()
+
+    def reset_panel(self, timeout=6):
+        """POST /api/reset — сбросить панель: лента покажет PIN-код."""
+        req = Request(self._url("/api/reset"), data=b"", method="POST")
+        with urllib_timeout(req, timeout) as r:
+            return r.read().decode("utf-8", "replace").strip()
+
+    def pair(self, code, timeout=4):
+        body = json.dumps({"code": code}).encode("utf-8")
+        req = Request(self._url("/api/pair"), data=body,
+                      headers={"Content-Type": "application/json"}, method="POST")
         with urllib_timeout(req, timeout) as r:
             return r.read().decode("utf-8", "replace").strip()
 
@@ -102,7 +138,20 @@ BLOCK_TYPES = [
     ("Новогодний салют",    "fx",     "FX:salute",                    []),
     ("Снег на ленте",       "fx",     "FX:snow",                      []),
     ("Ёлка на ленте",       "fx",     "FX:tree",                      []),
+    ("Гирлянда (клип)",     "fx",     "FX:garland",                   []),
+    ("Повторять программу", "ctrl",   "REPEAT",                       []),
 ]
+# op для прошивки (ScratchVM) по метке блока
+BLOCK_OPS = {
+    "Показать текст": "text", "Добавить в очередь": "text", "Эффект": "effect",
+    "Скорость": "speed", "Яркость": "bright", "Следующий клип": "next",
+    "Предыдущий клип": "next", "Очистить ленту": "clear", "Сохранить плейлист": "clear",
+    "Ждать (сек)": "wait", "Мигнуть текстом N раз": "blink",
+    "Новогодний салют": "fx", "Снег на ленте": "fx", "Ёлка на ленте": "fx",
+    "Гирлянда (клип)": "fx", "Повторять программу": "repeat",
+}
+BLOCK_FX = {"Новогодний салют": "salute", "Снег на ленте": "snow",
+            "Ёлка на ленте": "tree", "Гирлянда (клип)": "garland"}
 EFFECT_NAMES = {"0": "Белый", "1": "Гирлянда", "2": "Радуга", "3": "Снежный"}
 CAT_COLORS = {"text": "#2f7bd9", "look": "#d9822f", "ctrl": "#7a4fd9", "fx": "#c2386b"}
 
@@ -134,6 +183,7 @@ class App(tk.Tk):
         ttk.Entry(top, textvariable=self.ip_var, width=18).pack(side="left", padx=4)
         ttk.Button(top, text="Подключиться", command=self.do_connect).pack(side="left", padx=2)
         ttk.Button(top, text="Найти авто", command=self.do_discover).pack(side="left", padx=2)
+        ttk.Button(top, text="♻ Сбросить панель (код)", command=self.do_reset_panel).pack(side="left", padx=6)
         self.status_lbl = ttk.Label(top, text="⚪ не подключено", foreground="#888")
         self.status_lbl.pack(side="right")
 
@@ -178,6 +228,9 @@ class App(tk.Tk):
         ttk.Button(ctl, text="✕ Удалить", command=self.del_block).pack(side="left", padx=2)
         ttk.Button(ctl, text="💾 Сохранить .nyb", command=self.save_project).pack(side="left", padx=2)
         ttk.Button(ctl, text="📂 Открыть", command=self.open_project).pack(side="left", padx=2)
+        ttk.Separator(ctl, orient="vertical").pack(side="left", fill="y", padx=4)
+        ttk.Button(ctl, text="⬆ В ленту (autonomous)", command=self.upload_prg).pack(side="left", padx=2)
+        ttk.Button(ctl, text="⏹ Стоп на ленте", command=self.stop_on_device).pack(side="left", padx=2)
         self.block_list = tk.Listbox(mid, font=("Segoe UI", 11), activestyle="dotbox")
         self.block_list.pack(fill="both", expand=True, pady=4)
         self.blocks = []  # список dict(label, tmpl, args=[(name,value)...])
@@ -332,6 +385,75 @@ class App(tk.Tk):
 
     def log_line(self, s):
         self.log.insert("end", s + "\n"); self.log.see("end")
+
+    # ---------------------------- Scratch-программа в памяти ленты ----------
+    def compile_prg(self):
+        """Список блоков -> JSON для прошивки (ScratchVM)."""
+        arr = []
+        for b in self.blocks:
+            op = BLOCK_OPS.get(b["label"], "text")
+            vals = {n: v for n, v in b["args"]}
+            a = vals.get("текст", "") or vals.get("сек", "") or vals.get("число", "")
+            if op == "fx":
+                a = BLOCK_FX.get(b["label"], "salute")
+            item = {"op": op, "a": a}
+            if op == "text":
+                eff = vals.get("эффект", "1")
+                if not str(eff).isdigit():
+                    eff = {v: k for k, v in EFFECT_NAMES.items()}.get(eff, "1")
+                item["b"] = int(eff)
+                item["c"] = int(vals.get("скорость", 2) or 2)
+            if op == "blink":
+                item["b"] = int(vals.get("раз", 3) or 3)
+            arr.append(item)
+        return json.dumps(arr, ensure_ascii=False)
+
+    def upload_prg(self):
+        if not self.link.host:
+            messagebox.showwarning("Нет связи", "Сначала подключитесь к ленте.")
+            return
+        if not self.blocks:
+            messagebox.showinfo("Пусто", "Добавьте блоки в программу.")
+            return
+        prg = self.compile_prg()
+        def work():
+            try:
+                ans = self.link.send_prg(prg)
+                self.log_line(f"⬆ программа из {len(self.blocks)} блоков загружена в ленту ⇒ {ans}")
+                self.set_status("🟢 программа в ленте (работает автономно)", "#7ec97e")
+            except Exception as e:
+                self.log_line(f"✗ загрузка не удалась: {e}")
+                self.set_status("🔴 связь потеряна", "#e57373")
+        threading.Thread(target=work, daemon=True).start()
+
+    def stop_on_device(self):
+        def work():
+            try:
+                ans = self.link.stop_prg()
+                self.log_line(f"⏹ лента остановила программу ⇒ {ans}")
+            except Exception as e:
+                self.log_line(f"✗ {e}")
+        threading.Thread(target=work, daemon=True).start()
+
+    def do_reset_panel(self):
+        """Сбросить панель: лента покажет PIN-код и будет ждать привязки."""
+        if not self.link.host:
+            messagebox.showwarning("Нет связи", "Сначала подключитесь к ленте.")
+            return
+        if not messagebox.askyesno(
+                "Сбросить панель?",
+                "Лента покажет код (PIN) на панелях и перейдёт в режим привязки.\n"
+                "Управление по Wi-Fi станет недоступно, пока вы не введёте код."
+                "\n\nПродолжить?"):
+            return
+        def work():
+            try:
+                ans = self.link.reset_panel()
+                self.log_line(f"♻ сброс панели ⇒ {ans}")
+                self.set_status("🟡 панель ждёт ввода кода с ленты", "#ffd54f")
+            except Exception as e:
+                self.log_line(f"✗ сброс не удался: {e}")
+        threading.Thread(target=work, daemon=True).start()
 
     # ------------------------------------------------------ вкладка редактор --
     def _tab_editor(self):

@@ -22,7 +22,7 @@ extern Banner     gBanner;
 extern uint8_t    gEffect;
 extern bool       gAutonomous;
 
-void btRunCommand(String cmd);   // реализовано в bt.h — общая обработка команд
+// (btRunCommand уже предобъявлен в bt.h, который включается ДО webapi.h в .ino)
 
 static WebServer server(HTTP_PORT);
 
@@ -124,7 +124,11 @@ static void handleStatus() {
     "{\"state\":\"" + st + "\",\"buf_sec\":" + String(sec, 1) +
     ",\"wifi\":" + String(WiFi.status() == WL_CONNECTED ? "true" : "false") +
     ",\"ip\":\"" + WiFi.localIP().toString() + "\"" +
-    ",\"autonomous\":" + String(gAutonomous ? "true" : "false") + "}");
+    ",\"autonomous\":" + String(gAutonomous ? "true" : "false") +
+    ",\"paired\":" + String(gPrefs.getBool("paired", false) ? "true" : "false") +
+    ",\"scratch\":" + String(gScratch.running ? "true" : "false") +
+    ",\"blocks\":" + String((int)gScratch.blocks.size()) +
+    ",\"pin\":\"" + (gPairMode ? gPin : String("")) + "\"}");
 }
 
 // Поток: отдать следующие N секунд текущего эфира как кадры 8x96 (1 байт/пиксель).
@@ -148,6 +152,59 @@ static void handleStream() {
   c.stop();
 }
 
+// ---- Scratch-программа ленты ----
+static void handlePrgGet() { server.send(200, "application/json; charset=utf-8", gScratch.toJson()); }
+
+static void handlePrgPost() {
+  String body = server.arg("plain");
+  if (!gScratch.parseJson(body)) { server.send(400, "text/plain", "bad json"); return; }
+  gScratch.saveProg(); gScratch.restart(); gScratch.running = true;
+  server.send(200, "text/plain", "ok:" + String((int)gScratch.blocks.size()));
+}
+
+static void handleRun()  { if (!gScratch.blocks.empty()) { gScratch.restart(); gScratch.running = true; server.send(200,"text/plain","ok"); } else server.send(400,"text/plain","no prg"); }
+static void handleStop() { gScratch.running = false; gScratch.resumePlaylist(); server.send(200,"text/plain","ok"); }
+
+// Сброс панели: показать PIN-код и включить точку доступа для привязки
+static void handleResetPanel() {
+  gPrefs.putBool("paired", false);
+  pairEnter();
+  server.send(200, "application/json", "{\"pin\":\"" + gPin + "\",\"ap\":true}");
+}
+
+// Привязка по коду из приложения (когда лента уже в той же Wi-Fi сети):
+// POST /api/pair {"code":"1234"}
+static void handlePairPost() {
+  String body = server.arg("plain");
+  int ci = body.indexOf("\"code\"");
+  String code;
+  if (ci >= 0) { int q1 = body.indexOf('"', ci + 7); int q2 = body.indexOf('"', q1 + 1);
+                 if (q1 > 0 && q2 > q1) code = body.substring(q1 + 1, q2); }
+  if (code.length() == 4 && code == gPin) {
+    gPrefs.putBool("paired", true);
+    if (gPairMode) pairExit(true);
+    server.send(200, "text/plain", "ok-paired");
+  } else server.send(403, "text/plain", "bad code");
+}
+
+// Список Wi-Fi сетей вокруг (для меню настроек в приложениях)
+static void handleNetworks() {
+  String s = "[";
+  int n = WiFi.scanComplete();
+  for (int i = 0; i < n; i++) {
+    if (i) s += ",";
+    s += "{\"ssid\":\"" + jsonEscape(WiFi.SSID(i)) + "\",\"rssi\":" + String(WiFi.RSSI(i)) + "}";
+  }
+  s += "]";
+  WiFi.scanDelete();
+  server.send(200, "application/json; charset=utf-8", s);
+}
+
+static void handleScanReq() {
+  int r = WiFi.scanNetworks(true /*async*/);
+  server.send(200, "text/plain", r == WIFI_SCAN_RUNNING ? "scanning" : "started");
+}
+
 static void handleWifi() {
   String body = server.arg("plain");           // "ssid|пароль"
   btRunCommand("WIFI:" + body);
@@ -163,6 +220,14 @@ static void handleConfig() {
 
 void webSetup() {
   server.on("/", HTTP_GET, handleIndex);
+  server.on("/api/prg", HTTP_GET, handlePrgGet);
+  server.on("/api/prg", HTTP_POST, handlePrgPost);
+  server.on("/api/run", HTTP_POST, handleRun);
+  server.on("/api/stop", HTTP_POST, handleStop);
+  server.on("/api/reset", HTTP_POST, handleResetPanel);
+  server.on("/api/pair", HTTP_POST, handlePairPost);
+  server.on("/api/networks", HTTP_GET, handleNetworks);
+  server.on("/api/scan", HTTP_POST, handleScanReq);
   server.on("/api/playlist", HTTP_GET, handlePlaylistGet);
   server.on("/api/playlist", HTTP_POST, handlePlaylistPost);
   server.on("/api/command", HTTP_POST, handleCommand);

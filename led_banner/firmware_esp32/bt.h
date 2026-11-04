@@ -17,6 +17,8 @@
 #include <WiFi.h>
 #include <Preferences.h>
 #include <BluetoothSerial.h>   // Classic SPP (есть в пакете esp32 для Arduino)
+extern Preferences gPrefs;   // определён ниже (нужен scratchvm.h)
+#include "scratchvm.h"        // ScratchVM, gScratchPtr, pairEnter/pairExit
 
 extern RingBuffer gRB;
 extern Playlist   gPL;
@@ -39,7 +41,8 @@ void btSetup() {
 }
 
 // Общая обработка команд — используется и Bluetooth'ом, и /api/command (Wi-Fi)
-void btRunCommand(String cmd) {
+void btRunCommand(String cmd);   // предобъявление для webapi.h
+void btRunCommand(String cmd) {  // реализация
   cmd.trim();
   if (cmd.startsWith("TEXT:")) {
     String t = cmd.substring(5);
@@ -78,6 +81,7 @@ void btRunCommand(String cmd) {
     String pass = (p >= 0) ? v.substring(p + 1) : "";
     ssid.trim(); pass.trim();
     gPrefs.putString("ssid", ssid); gPrefs.putString("pass", pass);
+    gPrefs.putBool("paired", true);   // сеть задана приложением — панель привязана
     SerialBT.println("OK-SAVE-WIFI");
     WiFi.disconnect(); WiFi.begin(ssid.c_str(), pass.c_str());
   } else if (cmd.startsWith("PCURL:")) {
@@ -98,6 +102,32 @@ void btRunCommand(String cmd) {
       gFeeder.refillNow(gRB.cap / 2);
       SerialBT.println("OK-FX");
     } else SerialBT.println("ERR: unknown fx");
+  } else if (cmd.startsWith("PRG:")) {
+    // Загрузить Scratch-программу: PRG:[{"op":"text","a":"..."},...]
+    String j = cmd.substring(4);
+    ScratchVM* vm = gScratchPtr;
+    if (vm && vm->parseJson(j)) {
+      vm->saveProg(); vm->restart(); vm->running = true;
+      SerialBT.println("OK-PRG:" + String((int)vm->blocks.size()));
+    } else SerialBT.println("ERR: bad prg");
+  } else if (cmd == "RUN") {
+    if (gScratchPtr && !gScratchPtr->blocks.empty()) {
+      gScratchPtr->restart(); gScratchPtr->running = true; SerialBT.println("OK-RUN");
+    } else SerialBT.println("ERR: no prg");
+  } else if (cmd == "STOP") {
+    if (gScratchPtr) { gScratchPtr->running = false; gScratchPtr->resumePlaylist(); }
+    SerialBT.println("OK-STOP");
+  } else if (cmd == "ISCRATCH") {
+    // Сброс панели: показать PIN + режим привязки
+    gPrefs.putBool("paired", false);
+    SerialBT.println("OK-PIN");
+    pairEnter();
+  } else if (cmd == "GETCODE") {
+    SerialBT.println("PIN:" + gPin);
+  } else if (cmd == "PAIROK") {
+    gPrefs.putBool("paired", true);
+    pairExit(true);
+    SerialBT.println("OK-PAIRED");
   } else if (cmd == "REBOOT") {
     SerialBT.println("BYE"); delay(200); ESP.restart();
   } else if (cmd == "SAVE") {
