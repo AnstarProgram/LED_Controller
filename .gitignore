@@ -1,2 +1,6 @@
-*.bin
-*.vlw
+.gradle/
+build/
+*.class
+*.dex
+.idea/
+*.iml

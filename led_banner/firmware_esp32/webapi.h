@@ -116,27 +116,6 @@ static void handleCommand() {
   server.send(200, "text/plain", "ok");
 }
 
-// Зеркало эфира: отдать следующие N секунд кадров (8x96, 1 байт/пиксель),
-// чтобы ПК-приложение показывал превью ровно того, что на ленте.
-static void handleStream() {
-  int sec = server.arg("sec").toInt();
-  if (sec <= 0) sec = 10;
-  size_t n = min((uint32_t)(sec * TARGET_FPS), gRB.cap);
-  WiFiClient c = server.client();
-  c.print(String("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\n") +
-          "X-Frame-Px: " + String(gRB.framePx) + "\r\n" +
-          "X-W: " + String(gBanner.w()) + "\r\nX-H: " + String(gBanner.h()) + "\r\n" +
-          "X-Fps: " + String(TARGET_FPS) + "\r\n" +
-          "X-Frames: " + String(n) + "\r\nConnection: close\r\n\r\n");
-  uint32_t pos = gRB.playPos;
-  for (size_t i = 0; i < n && c.connected(); i++) {
-    const uint8_t* f = (pos < gRB.head) ? gRB.frameAt(pos++) : gRB.lastFrame();
-    if (f) c.write(f, gRB.framePx); else break;
-    if (i % 10 == 0) delay(1);                     // не душим воспроизведение
-  }
-  c.stop();
-}
-
 static void handleStatus() {
   String st = gRB.state == BUF_PLAYING ? "PLAYING" : gRB.state == BUF_WAIT ? "WAIT_NET"
             : gRB.state == BUF_READY ? "READY" : gRB.state == BUF_ERROR ? "ERROR" : "EMPTY";

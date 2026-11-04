@@ -1,0 +1,131 @@
+package com.newyear.banner.ui;
+
+/** Сгенерировано из font5x7.h прошивки ESP32 — идентичный рендер текста. */
+public final class Font5x7 {
+    private Font5x7() {}
+
+    private static final java.util.HashMap<Character,Long> M = new java.util.HashMap<>();
+    static {
+        M.put(' ', 0x100000000L);
+        M.put('!', 0x100421084L);
+        M.put('*', 0x295F57D4AL);
+        M.put('-', 0xF8000L);
+        M.put('.', 0x200000000L);
+        M.put(',', 0x220000000L);
+        M.put(':', 0x18C03180L);
+        M.put('/', 0x111000000L);
+        M.put('%', 0x22A22A20L);
+        M.put('(', 0x88842082L);
+        M.put(')', 0x208210888L);
+        M.put('+', 0x84F9080L);
+        M.put('=', 0x1F07C00L);
+        M.put('0', 0x3A39ACE2EL);
+        M.put('1', 0x388421184L);
+        M.put('2', 0x7D041062EL);
+        M.put('3', 0x3A211107EL);
+        M.put('4', 0x85F928C2L);
+        M.put('5', 0x3A210FA1FL);
+        M.put('6', 0x3A31F4106L);
+        M.put('7', 0x21082083FL);
+        M.put('8', 0x3A317462EL);
+        M.put('9', 0x30417C62EL);
+        M.put('A', 0x463F8C62EL);
+        M.put('B', 0x7A31F463EL);
+        M.put('C', 0x3A308422EL);
+        M.put('D', 0x72518C65CL);
+        M.put('E', 0x7E10F421FL);
+        M.put('F', 0x4210F421FL);
+        M.put('G', 0x3E338420FL);
+        M.put('H', 0x4631FC631L);
+        M.put('I', 0x38842108EL);
+        M.put('J', 0x324210847L);
+        M.put('K', 0x4654C5251L);
+        M.put('L', 0x7E1084210L);
+        M.put('M', 0x4631AD771L);
+        M.put('N', 0x4633AE631L);
+        M.put('O', 0x3A318C62EL);
+        M.put('P', 0x4210F463EL);
+        M.put('Q', 0x36558C62EL);
+        M.put('R', 0x4654F463EL);
+        M.put('S', 0x78217420FL);
+        M.put('T', 0x10842109FL);
+        M.put('U', 0x3A318C631L);
+        M.put('V', 0x11518C631L);
+        M.put('W', 0x4775AC631L);
+        M.put('X', 0x462A22A31L);
+        M.put('Y', 0x108422A31L);
+        M.put('Z', 0x7E082083FL);
+        M.put('А', 0x463F8C62EL);
+        M.put('Б', 0x7A31F421FL);
+        M.put('В', 0x3A31FC62EL);
+        M.put('Г', 0x4210C421FL);
+        M.put('Д', 0x46317C631L);
+        M.put('Е', 0x7E10F421FL);
+        M.put('Ж', 0x2BEA52BEAL);
+        M.put('З', 0x3A217C62EL);
+        M.put('И', 0x46314D671L);
+        M.put('Й', 0x46314DF75L);
+        M.put('К', 0x4654C5251L);
+        M.put('Л', 0x23087A10FL);
+        M.put('М', 0x4631AD771L);
+        M.put('Н', 0x4631FC631L);
+        M.put('О', 0x3A318C62EL);
+        M.put('П', 0x46318C63FL);
+        M.put('Р', 0x4210F463EL);
+        M.put('С', 0x3A308422EL);
+        M.put('Т', 0x10842109FL);
+        M.put('У', 0x45255C631L);
+        M.put('Ф', 0x11D5AD5C4L);
+        M.put('Х', 0x462A22A31L);
+        M.put('Ц', 0x76B5ACE31L);
+        M.put('Ч', 0x1C847D297L);
+        M.put('Ш', 0x4631FC631L);
+        M.put('Щ', 0x4631FC631L);
+        M.put('Ъ', 0x72518C65CL);
+        M.put('Ы', 0x6EB5AD6B3L);
+        M.put('Ь', 0x7251CD650L);
+        M.put('Э', 0x3A317862EL);
+        M.put('Ю', 0x4AB5AD7B2L);
+        M.put('Я', 0x784E94A4FL);
+        M.put('а', 0x1C17C5E0L);
+        M.put('б', 0x4210F462EL);
+        M.put('в', 0x21E8FA00L);
+        M.put('г', 0xE84210L);
+        M.put('д', 0x1B75631L);
+        M.put('е', 0x1D1FC5C0L);
+        M.put('ж', 0x15F57D40L);
+        M.put('з', 0xE8C5C0L);
+        M.put('и', 0x2314D660L);
+        M.put('й', 0x2314DE6CL);
+        M.put('к', 0x254C5640L);
+        M.put('л', 0x10E4A7C0L);
+        M.put('м', 0x231AEE20L);
+        M.put('н', 0x231FC620L);
+        M.put('о', 0x1D18C5C0L);
+        M.put('п', 0x210843E0L);
+        M.put('р', 0x21E8FA00L);
+        M.put('с', 0x1D1845C0L);
+        M.put('т', 0x84213E0L);
+        M.put('у', 0x22F0FE20L);
+        M.put('ф', 0x8EFB880L);
+        M.put('х', 0x22E74400L);
+        M.put('ц', 0x3B5ADE20L);
+        M.put('ч', 0x87652E0L);
+        M.put('ш', 0x231FC620L);
+        M.put('щ', 0x631FC620L);
+        M.put('ъ', 0x39294A20L);
+        M.put('ы', 0x375AD620L);
+        M.put('ь', 0x3928C64CL);
+        M.put('э', 0xE8C5C0L);
+        M.put('ю', 0x255AF640L);
+        M.put('я', 0x5E13A60L);
+        M.put('ё', 0x1D1FC5C4L);
+        M.put('Ё', 0x3D08F230FL);
+    }
+
+    /** 0 = нет глифа. Бит (row*5 + (4-col)) — пиксель. */
+    public static long glyph(char c) {
+        Character k = c; Long v = M.get(k);
+        return v == null ? 0 : v;
+    }
+}
