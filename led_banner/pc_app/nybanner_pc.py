@@ -184,6 +184,7 @@ class App(tk.Tk):
         ttk.Button(top, text="Подключиться", command=self.do_connect).pack(side="left", padx=2)
         ttk.Button(top, text="Найти авто", command=self.do_discover).pack(side="left", padx=2)
         ttk.Button(top, text="♻ Сбросить панель (код)", command=self.do_reset_panel).pack(side="left", padx=6)
+        ttk.Button(top, text="🔑 PIN…", command=self.do_change_pin).pack(side="left", padx=2)
         self.status_lbl = ttk.Label(top, text="⚪ не подключено", foreground="#888")
         self.status_lbl.pack(side="right")
 
@@ -454,6 +455,36 @@ class App(tk.Tk):
             except Exception as e:
                 self.log_line(f"✗ сброс не удался: {e}")
         threading.Thread(target=work, daemon=True).start()
+
+    def do_change_pin(self):
+        """Сменить PIN-код ленты. 0000 = вход без пароля (открытый доступ)."""
+        if not self.link.host:
+            messagebox.showwarning("Нет связи", "Сначала подключитесь к ленте.")
+            return
+        win = tk.Toplevel(self)
+        win.title("PIN-код ленты")
+        win.geometry("360x170")
+        ttk.Label(win, text="Новый PIN (4 цифры).\n0000 — открывает ленту БЕЗ пароля:",
+                  justify="left").pack(padx=12, pady=(12, 4), anchor="w")
+        var = tk.StringVar(value="0000")
+        ent = ttk.Entry(win, textvariable=var, font=("Consolas", 16), width=8)
+        ent.pack(pady=4)
+        msg = ttk.Label(win, text="", foreground="#c62828")
+        msg.pack()
+        def ok():
+            code = var.get().strip()
+            if not (code.isdigit() and len(code) == 4):
+                msg.config(text="Нужны ровно 4 цифры"); return
+            def work():
+                try:
+                    ans = self.link.command("PIN " + code)
+                    self.log_line(f"🔑 смена PIN ⇒ {ans}")
+                    win.after(0, win.destroy)
+                except Exception as e:
+                    win.after(0, lambda: msg.config(text=str(e)))
+            threading.Thread(target=work, daemon=True).start()
+        ttk.Button(win, text="Применить", command=ok).pack(pady=6)
+        ent.focus_set()
 
     # ------------------------------------------------------ вкладка редактор --
     def _tab_editor(self):

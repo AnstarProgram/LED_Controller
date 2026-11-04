@@ -13,6 +13,7 @@
 //     ISCRATCH       — сбросить панель: показать PIN-код + включить Wi-Fi AP
 //                      (делается при первом включении автоматически)
 //     GETCODE        — вернуть текущий PIN
+//     PIN 1234       — сменить PIN-код (0000 = вход без пароля, по умолчанию)
 //     BRIGHT:n / EFFECT:n / CLEAR / SAVE — как обычно
 // ============================================================================
 #pragma once
@@ -255,10 +256,22 @@ static uint32_t gPairSince = 0;
 static WiFiServer gPairSrv(80);   // порт 80 — страница входа в AP (как у роутера)
 
 String genPin() {
+  // Читаем сохранённый PIN (команда «PIN 1234» меняет его), иначе — PIN_DEFAULT.
+  int saved = gPrefs.getInt("pin", -1);
+  int use = (saved >= 0) ? saved : PIN_DEFAULT;
   char buf[5];
-  uint32_t r = (uint32_t)(esp_random() % 9000 + 1000);
-  snprintf(buf, sizeof(buf), "%04u", (unsigned)r);
+  snprintf(buf, sizeof(buf), "%04d", use % 10000);
   return String(buf);
+}
+
+// Проверка введённого кода: пустая строка и «0000» принимаются всегда, когда
+// лента открытая (PIN_DEFAULT == 0) — то есть вход без пароля.
+bool pinAccept(const String& code) {
+  if (code == gPin) return true;
+  if (PIN_DEFAULT == 0 && (code.isEmpty() || code == "0000")) return true;
+  int saved = gPrefs.getInt("pin", -1);
+  if (saved == 0 && (code.isEmpty() || code == "0000")) return true;
+  return false;
 }
 
 static void drawCentered(const String& line) {
@@ -305,7 +318,7 @@ static void pairHttpOnce() {
     }
     int ci = body.indexOf("code=");
     String code = ci >= 0 ? body.substring(ci + 5, ci + 9) : "";
-    bool ok = (code == gPin);
+    bool ok = pinAccept(code);   // пустой код / 0000 проходит при открытом доступе
     String resp = ok ?
       "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n"
       "<meta charset=utf-8><body style='font-family:system-ui;background:#0b1020;color:#eaf'>"

@@ -28,6 +28,8 @@ extern uint8_t    gEffect;
 extern String     gPcUrl;      // адрес ПК-приложения (стрим-режим), определён в .ino
 
 static Preferences gPrefs;     // энергонезависимое хранение Wi-Fi/URL настроек
+extern String genPin();        // определено в scratchvm.h (PIN из config.h / памяти)
+extern bool pinAccept(const String& code);
 
 void prefsSetup() {
   gPrefs.begin("nybanner", false);
@@ -124,6 +126,14 @@ void btRunCommand(String cmd) {  // реализация
     pairEnter();
   } else if (cmd == "GETCODE") {
     SerialBT.println("PIN:" + gPin);
+  } else if (cmd.startsWith("PIN")) {
+    // Сменить PIN-код: «PIN 1234», «PIN:1234» или «PIN 0» (=0000, вход без пароля)
+    String arg = cmd.substring(3); arg.trim(); arg.replace(":", ""); arg.trim();
+    if (arg.length() >= 1 && arg.toInt() >= 0 && arg.toInt() <= 9999) {
+      gPrefs.putInt("pin", arg.toInt());
+      gPin = genPin();
+      SerialBT.println("OK-PIN:" + gPin);
+    } else SerialBT.println("ERR: pin 0..9999");
   } else if (cmd == "PAIROK") {
     gPrefs.putBool("paired", true);
     pairExit(true);

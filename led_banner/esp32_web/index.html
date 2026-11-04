@@ -21,18 +21,25 @@ canvas{background:#000;border-radius:10px;width:100%;image-rendering:pixelated}
 #pinScreen{position:fixed;inset:0;background:#0b1020;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;z-index:9}
 .pin{font-size:56px;letter-spacing:14px;color:var(--grn);font-weight:800}
 small{color:#8fa0cc}
+.tabs{display:flex;gap:8px}
+.tabs button{background:#1c2447;color:#cdd8ff;border:1px solid #3a4370;font-weight:600}
+.tabs button.on{background:var(--acc);color:#04101f;border-color:var(--acc)}
+.note{background:#12203a;border:1px solid #2a3f6a;padding:10px 14px;border-radius:10px;max-width:420px;text-align:center}
 </style>
 </head>
 <body>
 <div id="pinScreen">
   <h1>NYBanner — панель управления</h1>
-  <small>Введите PIN-код, который показывает LED-лента при включении.<br>(или нажмите «Сбросить панель» в приложении, чтобы получить новый)</small>
-  <input id="pinIn" maxlength="6" placeholder="PIN" style="width:200px;text-align:center;font-size:24px">
-  <div class="row">
-    <input id="hostIn" placeholder="IP ленты (необязательно)" style="width:220px">
-    <button onclick="login()">Войти</button>
+  <div class="tabs">
+    <button id="tabOpen" class="on" onclick="setMode('open')">Без PIN-кода</button>
+    <button id="tabPin" onclick="setMode('pin')">По PIN-коду</button>
   </div>
+  <div class="note" id="modeNote">🔓 Лента доступна без PIN-кода. Просто нажмите «Войти».</div>
+  <input id="pinIn" maxlength="6" placeholder="PIN" style="width:200px;text-align:center;font-size:24px" class="hidden">
+  <input id="hostIn" placeholder="IP ленты (например 192.168.1.50)" style="width:280px;text-align:center">
+  <button class="g" onclick="login()" style="min-width:160px">Войти</button>
   <small id="pinErr" style="color:var(--red)"></small>
+  <small>IP ленты виден в мониторе порта ESP32 или в приложении на телефоне.</small>
 </div>
 
 <header><h1>🎄 NYBanner · управление</h1><span id="devInfo"><small>не подключено</small></span>
@@ -70,28 +77,36 @@ small{color:#8fa0cc}
 </div>
 
 <script>
-let HOST = null, TOKEN = '';
+let HOST = null, TOKEN = '', MODE = 'open';
 const $ = id => document.getElementById(id);
+function setMode(m){
+  MODE = m;
+  $('tabOpen').classList.toggle('on', m==='open');
+  $('tabPin').classList.toggle('on', m==='pin');
+  $('pinIn').classList.toggle('hidden', m==='open');
+  $('modeNote').textContent = (m==='open')
+    ? '🔓 Открытый доступ — PIN-код не нужен. Нажмите «Войти».'
+    : '🔒 Введите PIN-код, который показывает LED-лента при включении (или после «Сбросить панель»).';
+}
 function log(s){ $('log').textContent += s + "\n"; $('log').scrollTop = 1e9; }
 async function api(path, body){
+  const h = {}; if(TOKEN) h['X-PIN'] = TOKEN;
   const r = await fetch(`http://${HOST}:8765${path}`, {method: body?'POST':'GET',
-    headers:{'X-PIN':TOKEN}, body: body||undefined});
-  if(r.status===401) throw new Error('PIN не подошёл');
+    headers:h, body: body||undefined});
+  if(r.status===401) throw new Error('PIN не подошёл (или лента требует PIN — выберите режим «По PIN-коду»)');
   return (await r.text()).trim();
 }
 async function login(){
   $('pinErr').textContent='';
   let host = $('hostIn').value.trim();
+  if(!host){ $('pinErr').textContent='Введите IP ленты (он показывается в мониторе порта ESP32).'; return; }
   try{
-    if(!host){ // автопоиск UDP broadcast
-      host = await autoFind();
-    }
-    HOST = host; TOKEN = $('pinIn').value.trim();
+    HOST = host; TOKEN = (MODE==='pin') ? $('pinIn').value.trim() : '';
     const st = await api('/api/status');
-    $('devInfo').innerHTML = '<small>подключено: '+HOST+'</small>';
+    $('devInfo').innerHTML = '<small>подключено: '+HOST+(TOKEN?' · по PIN':' · без PIN')+'</small>';
     $('pinScreen').classList.add('hidden'); $('ui').classList.remove('hidden');
     log('STATUS: '+st);
-  }catch(e){ $('pinErr').textContent = 'Ошибка: '+e.message+' (проверьте IP и PIN)'; }
+  }catch(e){ $('pinErr').textContent = 'Ошибка: '+e.message+' (проверьте IP и режим входа)'; }
 }
 function autoFind(){ return new Promise((res,rej)=>{ /* браузер не умеет UDP — просим ввести IP */ rej(new Error('введите IP ленты (см. монитор порта ESP32)')); }); }
 function logout(){ $('pinScreen').classList.remove('hidden'); $('ui').classList.add('hidden'); }

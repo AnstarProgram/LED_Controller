@@ -130,6 +130,7 @@ void setup() {
 
   LittleFS.begin(true);
   prefsSetup();
+  gPin = genPin();   // PIN из памяти/конфига: «0000» = вход без пароля
   // сохранённые из приложения настройки имеют приоритет над config.h
   String ssid = gPrefs.getString("ssid", WIFI_SSID);
   String pass = gPrefs.getString("pass", WIFI_PASS);
@@ -164,12 +165,12 @@ void setup() {
     splash("WiFi OK");
   } else splash("WiFi NET");
 
-  // ---- ПЕРВОЕ ВКЛЮЧЕНИЕ: показываем PIN-код на панелях + AP «NY-BANNER-SETUP».
-  // Приложение (сайт/Android/ПК) подключается и вводит код — только после
-  // этого панель «привязана» и работает штатно. Кнопка «Сбросить панель»
-  // в приложениях возвращает сюда же (команда ISCRATCH).
+  // ---- ПЕРВОЕ ВКЛЮЧЕНИЕ: лента показывает код на панелях и поднимает AP
+  // «NY-BANNER-SETUP». По умолчанию код — «0000», то есть вход БЕЗ пароля:
+  // на сайте/в приложении достаточно нажать «Войти» (или ввести 0000).
+  // Кнопка «Сбросить панель» возвращает сюда же; сменить код — командой PIN.
   bool paired = gPrefs.getBool("paired", false);
-  if (!paired) { pairEnter(); }
+  if (!paired && !pinAccept("")) { pairEnter(); }   // открытая лента не требует привязки
 
   // Если в памяти ленты лежит Scratch-программа — сразу запускаем её.
   if (gScratch.loadProg()) { gScratch.running = true; gScratch.restart(); }

@@ -128,6 +128,7 @@ static void handleStatus() {
     ",\"paired\":" + String(gPrefs.getBool("paired", false) ? "true" : "false") +
     ",\"scratch\":" + String(gScratch.running ? "true" : "false") +
     ",\"blocks\":" + String((int)gScratch.blocks.size()) +
+    ",\"open\":" + String(pinAccept("") ? "true" : "false") +
     ",\"pin\":\"" + (gPairMode ? gPin : String("")) + "\"}");
 }
 
@@ -173,14 +174,14 @@ static void handleResetPanel() {
 }
 
 // Привязка по коду из приложения (когда лента уже в той же Wi-Fi сети):
-// POST /api/pair {"code":"1234"}
+// POST /api/pair {"code":"1234"}  (пустой код/0000 — вход без пароля)
 static void handlePairPost() {
   String body = server.arg("plain");
   int ci = body.indexOf("\"code\"");
   String code;
   if (ci >= 0) { int q1 = body.indexOf('"', ci + 7); int q2 = body.indexOf('"', q1 + 1);
                  if (q1 > 0 && q2 > q1) code = body.substring(q1 + 1, q2); }
-  if (code.length() == 4 && code == gPin) {
+  if (pinAccept(code)) {          // открытый режим (PIN 0000) пропускает пустой код
     gPrefs.putBool("paired", true);
     if (gPairMode) pairExit(true);
     server.send(200, "text/plain", "ok-paired");
