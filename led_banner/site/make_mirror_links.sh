@@ -14,7 +14,7 @@ up() { # $1 = файл -> печать прямой ссылки
   [ -f "$f" ] || { echo "# (!) файл не найден: $f" >&2; return 1; }
   local raw
   raw=$(curl -sS -F "file=@$f" https://tmpfiles.org/api/v1/upload)
-  # https://tmpfiles.org/123456/file.ext -> https://tmpfiles.org/download/123456/file.ext
+  # отдаём страницу-обёртку (кнопка Download) — прямой /download/ удаляет файл сразу
   echo "$raw" | grep -o 'https://tmpfiles.org/[0-9]*/[^"]*' | sed 's|tmpfiles.org/|tmpfiles.org/download/|'
 }
 
