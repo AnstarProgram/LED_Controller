@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Вкладка «Файлы»: сайт для скачивания прошивок/плейлистов + загрузка на ленту -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="12dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical">
+        <EditText android:id="@+id/etUrl" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:hint="@string/files_hint"
+            android:inputType="textUri" android:textColorHint="#5A6490"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenPage" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginStart="6dp" android:text="@string/btn_open_page"/>
+    </LinearLayout>
+
+    <TextView android:id="@+id/tvDlState" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textColor="@color/muted" android:textSize="13sp" android:layout_marginTop="4dp"/>
+
+    <ListView android:id="@+id/lvFiles" android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:divider="#2A3158" android:dividerHeight="1px"/>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="6dp">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDownload" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:text="@string/btn_download"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSendFileToBanner" style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp" android:layout_weight="1" android:layout_marginStart="8dp"
+            android:layout_height="wrap_content" android:text="JSON → на ленту"/>
+    </LinearLayout>
+</LinearLayout>

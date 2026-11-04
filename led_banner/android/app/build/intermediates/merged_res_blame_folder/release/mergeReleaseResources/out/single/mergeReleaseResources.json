@@ -1,0 +1,70 @@
+[
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/menu_main_menu.xml.flat",
+        "source": "com.newyear.banner.app-main-34:/menu/main_menu.xml"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/layout_fragment_files.xml.flat",
+        "source": "com.newyear.banner.app-main-34:/layout/fragment_files.xml"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/layout_item_queue.xml.flat",
+        "source": "com.newyear.banner.app-main-34:/layout/item_queue.xml"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-xxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/layout_fragment_devices.xml.flat",
+        "source": "com.newyear.banner.app-main-34:/layout/fragment_devices.xml"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/layout_activity_main.xml.flat",
+        "source": "com.newyear.banner.app-main-34:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/layout_fragment_editor.xml.flat",
+        "source": "com.newyear.banner.app-main-34:/layout/fragment_editor.xml"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.newyear.banner.app-main-34:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.newyear.banner.app-release-33:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.newyear.banner.app-main-34:/drawable/ic_launcher_foreground.xml"
+    }
+]
