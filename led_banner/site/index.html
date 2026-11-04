@@ -35,7 +35,7 @@ code{background:#0d1330;padding:2px 6px;border-radius:6px;color:var(--acc)}
       <h2>📱 Приложение для телефона</h2>
       Мини-редактор, живое превью 1:1, подключение ленты по Wi-Fi и Bluetooth.
       <br><a class="btn b1" id="dl-apk" href="#">Скачать APK</a>
-      <br><a class="btn b2" id="dl-apk-alt" href="#">Скачать APK (зеркало — tmpfiles.org)</a>
+      <br><a class="btn b2" id="dl-apk-alt" href="#">Скачать APK (зеркало — onlyfiles.com)</a>
       <br><a class="btn b3" href="https://apps.rustore.ru/">RuStore (скоро)</a>
     </div>
     <div class="card">
@@ -43,7 +43,7 @@ code{background:#0d1330;padding:2px 6px;border-radius:6px;color:var(--acc)}
       <h2>💻 Программа для ПК</h2>
       Три режима: блоки как в Scratch, простой редактор текста и прямой ввод кода. Настройка Wi-Fi ленты.
       <br><a class="btn b2" id="dl-pc" href="#">Скачать NYBanner.exe</a>
-      <br><a class="btn b2" id="dl-pc-alt" href="#">Скачать .exe (зеркало — tmpfiles.org)</a>
+      <br><a class="btn b2" id="dl-pc-alt" href="#">Скачать .exe (зеркало — onlyfiles.com)</a>
     </div>
     <div class="card">
       <div class="badge">Arduino IDE</div>
@@ -73,19 +73,16 @@ code{background:#0d1330;padding:2px 6px;border-radius:6px;color:var(--acc)}
 const REPO = "ВАШ_ЛОГИН/nybanner";
 const TAG  = "latest"; // latest — всегда последняя версия
 
-// 2) Зеркало — файлообменник с рекламой (tmpfiles.org).
+// 2) Зеркало — файлообменник с рекламой (onlyfiles.com).
 //    Нужен, если GitHub недоступен или ещё не настроен.
-//    ВАЖНО: ссылки tmpfiles живут ~60 минут после ВЫКЛАДКИ и удаляются
-//    после первого скачивания. Перед публикацией сайта перегенерируйте
-//    их скриптом:  bash site/make_mirror_links.sh  (нужен curl)
-//    и вставьте сюда свежие URL. Ссылки вида /XXX/ -> /download/XXX
-//    НЕ используйте их — скачивание идёт со страницы-обёртки (с рекламой).
-//    Скрипт make_mirror_links.sh ниже уже отдаёт обычные страницы.
+//    OnlyFiles хранит файлы несколько дней, но
+//    на странице скачивания есть реклама. Обновить ссылки:
+//    bash site/make_mirror_links.sh   (загружает на onlyfiles через API)
 const MIRROR = {
-  apk:      "https://tmpfiles.org/w2AwoDGeKGhp/nybanner-debug.apk",    // приложение для телефона
-  release:  "https://tmpfiles.org/wgA7oOGlK281/nybanner-v1.0.0.apk",   // подписанный релиз (RuStore)
+  apk:      "https://onlyfiles.com/wZwYw0oovo7G/nybanner-debug.apk",    // приложение для телефона
+  release:  "https://onlyfiles.com/w8w8wCoevltF/nybanner-release.apk",  // подписанный релиз (RuStore)
   exe:      "", /* .exe ещё не собран — сгенерируйте и вставьте сюда */
-  firmware: "https://tmpfiles.org/w7AUo2GfZinG/nybanner_vse_v1.0.zip"  // весь проект + прошивка
+  firmware: "https://onlyfiles.com/wKwDwcoDvBXY/nybanner_vse_v1.0.zip"  // весь проект + прошивка
 };
 
 // Если GitHub ещё не настроен (логин не заменён) — основные кнопки
@@ -93,8 +90,8 @@ const MIRROR = {
 const ghReady = !REPO.includes("ВАШ_ЛОГИН");
 const base = `https://github.com/${REPO}/releases/${TAG}/download/`;
 
-// tmpfiles.org отдаёт файл только со своей страницы (кнопка Download) —
-// так и задумано: там показывается реклама, зато ссылка жива ~1 час.
+// Страницы onlyfiles.com отдают файл по кнопке Download (с рекламой) —
+// это и есть «зеркало». Основные кнопки ведут туда, пока GitHub не настроен.
 
 document.getElementById('dl-apk').href = ghReady ? base + 'NYBanner.apk' : MIRROR.apk;
 document.getElementById('dl-pc').href  = ghReady ? base + 'NYBanner-PC.zip' : (MIRROR.exe ? MIRROR.exe : MIRROR.firmware);
@@ -104,7 +101,7 @@ document.getElementById('dl-pc-alt').href  = MIRROR.exe ? MIRROR.exe : MIRROR.fi
 document.getElementById('ghlink').href = `https://github.com/${REPO}`;
 </script>
 <p style="text-align:center;color:#8aa;font-size:13px;margin-top:14px">
-  ⚠️ Кнопки «зеркало» ведут на tmpfiles.org — там есть реклама, файлы живут ~1 час.<br>
+  ⚠️ Кнопки «зеркало» ведут на onlyfiles.com — там есть реклама, файлы хранятся несколько дней.<br>
   Надёжнее один раз выложить на GitHub Releases (инструкция: github/KAK_ZALIT_APK.md).
 </p>
 </body>
