@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."
 APK="NYBanner-debug.apk"                 # приложение для телефона
 REL="NYBanner-release.apk"               # подписанный релиз (RuStore)
 EXE="pc_app/dist/NYBanner.exe"           # собранный .exe (если нет — пропустится)
-ZIP="github/NYBanner_vse_v1.0.zip"       # весь проект + прошивка
+ZIP="vsy.444.zip"       # весь проект + прошивка
 
 up() { # $1 = файл -> печать ссылки на страницу onlyfiles.com
   local f="$1"
