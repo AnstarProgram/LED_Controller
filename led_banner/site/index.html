@@ -35,6 +35,7 @@ code{background:#0d1330;padding:2px 6px;border-radius:6px;color:var(--acc)}
       <h2>📱 Приложение для телефона</h2>
       Мини-редактор, живое превью 1:1, подключение ленты по Wi-Fi и Bluetooth.
       <br><a class="btn b1" id="dl-apk" href="#">Скачать APK</a>
+      <br><a class="btn b2" id="dl-apk-alt" href="#">Скачать APK (зеркало — tmpfiles.org)</a>
       <br><a class="btn b3" href="https://apps.rustore.ru/">RuStore (скоро)</a>
     </div>
     <div class="card">
@@ -42,6 +43,7 @@ code{background:#0d1330;padding:2px 6px;border-radius:6px;color:var(--acc)}
       <h2>💻 Программа для ПК</h2>
       Три режима: блоки как в Scratch, простой редактор текста и прямой ввод кода. Настройка Wi-Fi ленты.
       <br><a class="btn b2" id="dl-pc" href="#">Скачать NYBanner.exe</a>
+      <br><a class="btn b2" id="dl-pc-alt" href="#">Скачать .exe (зеркало — tmpfiles.org)</a>
     </div>
     <div class="card">
       <div class="badge">Arduino IDE</div>
@@ -62,14 +64,45 @@ code{background:#0d1330;padding:2px 6px;border-radius:6px;color:var(--acc)}
 </div>
 <footer>NYBanner v2.0 · сделано к Новому 2027 году ✨ · <a style="color:#4fd1ff" id="ghlink" href="#">GitHub проекта</a></footer>
 <script>
-// <<< ЗАМЕНИТЕ на свой GitHub: логин и имя репозитория >>>
+// ============================================================
+// НАСТРОЙКИ САЙТА — правьте только этот блок
+// ============================================================
+
+// 1) Основной источник — GitHub Releases (без рекламы).
+//    ЗАМЕНИТЕ на свой логин/репозиторий после публикации релизов.
 const REPO = "ВАШ_ЛОГИН/nybanner";
 const TAG  = "latest"; // latest — всегда последняя версия
+
+// 2) Зеркало — файлообменник с рекламой (tmpfiles.org).
+//    Нужен, если GitHub недоступен или ещё не настроен.
+//    ВАЖНО: ссылки tmpfiles живут ~60 минут после ВЫКЛАДКИ и удаляются
+//    после первого скачивания. Перед публикацией сайта перегенерируйте
+//    их скриптом:  bash site/make_mirror_links.sh  (нужен curl)
+//    и вставьте сюда свежие URL. Ссылки вида /XXX/ -> /download/XXX
+//    открывают файл напрямую без ожидания.
+const MIRROR = {
+  apk:      "https://tmpfiles.org/wPAVo1rdieSR/nybanner-debug.apk",   // <<< свежие ссылки
+  exe:      "https://tmpfiles.org/wCAXohriiFr6/nybanner-release.apk", // <<< для .exe подставьте свою
+  firmware: "https://tmpfiles.org/wJAioKr6ipup/nybanner_vse_v1.0.zip" // весь проект (зеркало прошивки)
+};
+
+// Если GitHub ещё не настроен (логин не заменён) — основные кнопки
+// сами ведут на зеркало, сайт сразу рабочий «из коробки».
+const ghReady = !REPO.includes("ВАШ_ЛОГИН");
 const base = `https://github.com/${REPO}/releases/${TAG}/download/`;
-document.getElementById('dl-apk').href = base + 'NYBanner.apk';
-document.getElementById('dl-pc').href  = base + 'NYBanner-PC.zip';
-document.getElementById('dl-fw').href  = base + 'firmware.zip';
+
+function direct(u){ return u.replace("tmpfiles.org/", "tmpfiles.org/download/"); }
+
+document.getElementById('dl-apk').href = ghReady ? base + 'NYBanner.apk' : direct(MIRROR.apk);
+document.getElementById('dl-pc').href  = ghReady ? base + 'NYBanner-PC.zip' : direct(MIRROR.exe);
+document.getElementById('dl-fw').href  = ghReady ? base + 'firmware.zip' : direct(MIRROR.firmware);
+document.getElementById('dl-apk-alt').href = direct(MIRROR.apk);
+document.getElementById('dl-pc-alt').href  = direct(MIRROR.exe);
 document.getElementById('ghlink').href = `https://github.com/${REPO}`;
 </script>
+<p style="text-align:center;color:#8aa;font-size:13px;margin-top:14px">
+  ⚠️ Кнопки «зеркало» ведут на tmpfiles.org — там есть реклама, файлы живут ~1 час.<br>
+  Надёжнее один раз выложить на GitHub Releases (инструкция: github/KAK_ZALIT_APK.md).
+</p>
 </body>
 </html>
