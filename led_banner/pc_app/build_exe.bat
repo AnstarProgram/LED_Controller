@@ -1,82 +1,125 @@
 @echo off
-chcp 65001 >nul
-title NYBanner PC - sborka EXE
 rem ============================================================
-rem  SKRIPT RABOTAET OT PUTI F:\pc_app (i iz lyuboy drugoy papki):
-rem    F:\pc_app\build_exe.bat   <- etot fail
-rem    F:\pc_app\nybanner_pc.py  <- programma
-rem  Dvoynoj klik - i poluchite F:\pc_app\NYBanner_PC.exe
+rem  NYBanner PC - sborka NYBanner_PC.exe (v3.2)
+rem  Rabotaet ot lyuboj papki, v tom chisle F:\pc_app
+rem  Dvoynoj klik -> gotovij fail v etoj zhe papke
 rem ============================================================
 
+setlocal EnableExtensions
 set "SRCDIR=%~dp0"
 
-rem --- esli pybanner_pc.py ne ryadom, ishchem po tipichnym putyam ---
-if not exist "%SRCDIR%nybanner_pc.py" (
-  if exist "F:\pc_app\nybanner_pc.py" set "SRCDIR=F:\pc_app\"
-)
-if not exist "%SRCDIR%nybanner_pc.py" (
-  if exist "%USERPROFILE%\Desktop\pc_app\nybanner_pc.py" set "SRCDIR=%USERPROFILE%\Desktop\pc_app\"
-)
-if not exist "%SRCDIR%nybanner_pc.py" (
-  echo.
-  echo  [!] NE NAIDEN FAIL nybanner_pc.py
-  echo      Skript razmeshen: %~f0
-  echo      Ryadom so skriptom dolzen lezhat nybanner_pc.py
-  echo      Pravil'noe razmeshchenie: F:\pc_app\build_exe.bat + F:\pc_app\nybanner_pc.py
-  pause
-  exit /b 1
-)
+chcp 866 >nul 2>&1
 
 cd /d "%SRCDIR%."
 
 echo.
-echo  Rabochaya papka: %CD%
+echo  ============================================
+echo   NYBanner PC - sborka EXE
+echo   Papka: %CD%
+echo  ============================================
 echo.
 
-rem --- Python: snachala py launcher, potom python iz PATH ---
+rem --- shagi dlya Windows-7/8: PyInstaller ne zapuskaetsya bez KB2533623 ---
+ver | find "6.1." >nul 2>&1 && set "OLDWIN=1"
+if not defined OLDWIN ver | find "6.2." >nul 2>&1 && set "OLDWIN=1"
+if not defined OLDWIN ver | find "6.3." >nul 2>&1 && set "OLDWIN=1"
+
+rem --- nybanner_pc.py ryadom so skriptom? esli net - tipichnye puti ---
+if not exist "%SRCDIR%nybanner_pc.py" (
+  if exist "F:\pc_app\nybanner_pc.py" (
+    set "SRCDIR=F:\pc_app\"
+    cd /d "%SRCDIR%."
+  )
+)
+if not exist "%SRCDIR%nybanner_pc.py" (
+  echo  [!] NE NAIDEN fail nybanner_pc.py
+  echo      Razmestite ego RYADOM s etim bat-fajlom, primer:
+  echo        F:\pc_app\build_exe.bat
+  echo        F:\pc_app\nybanner_pc.py
+  echo  [X] SBORKA PROVALENA: NET ISHODNIKA
+  pause
+  exit /b 1
+)
+
+rem --- ishchem Python: py launcher, python, python3 ---
 set "PY="
 py -3 --version >nul 2>&1 && set "PY=py -3"
 if not defined PY (
   python --version >nul 2>&1 && set "PY=python"
 )
 if not defined PY (
-  echo  [!] Python ne naden. Ustanovite s https://python.org
-  echo      i POSTAV'TE galochku "Add Python to PATH" pri ustanovke.
+  for %%P in (
+    "%LOCALAPPDATA%\Programs\Python\Python314\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python313\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python311\python.exe"
+    "C:\Program Files\Python314\python.exe"
+    "C:\Program Files\Python313\python.exe"
+    "C:\Python314\python.exe"
+    "C:\Python313\python.exe"
+  ) do if not defined PY if exist %%P set "PY=%%~P"
+)
+if not defined PY (
+  echo  [!] Python ne najden. Ustanovite s https://python.org
+  echo      i POSTAV'TE galochku "Add Python to PATH".
   pause
   exit /b 1
 )
-echo  Found Python:
+
+echo  Python:
 %PY% --version
 echo.
 
-rem --- zavisimosti: PyInstaller + Pillow (tkinter uzhe v sostave Python) ---
-echo  Proveryayu zavysimosti...
-%PY% -m PyInstaller --version >nul 2>&1 || %PY% -m pip install --upgrade pyinstaller pillow
+rem --- Glavnoj fix: ispol'zuem TOL'KO "%PY% -m PyInstaller", a ne komandu
+rem     "pyinstaller". Pri user-install (site-packages ne writeable) fayl
+rem     pyinstaller.exe kladetsya v ...\Roaming\Python\Scripts\, kotoryj
+rem     ochen' chastno NOT v PATH - otSyuda byla oshibka
+rem     ""pyinstaller" ne yavlyayetsya komandoj". ---
+echo  Proveryayu PyInstaller...
+%PY% -m PyInstaller --version >nul 2>&1
 if errorlevel 1 (
-  echo  [!] Ne udalos' ustanovit' PyInstaller. Povernut' komanda:
-  echo      %PY% -m pip install pyinstaller pillow
+  echo  PyInstaller net v etoj versii Python - ustanavlivayu...
+  %PY% -m pip install --user --upgrade pyinstaller
+)
+%PY% -m PyInstaller --version >nul 2>&1
+if errorlevel 1 (
+  echo  [!] Ne udalos' ustanovit' PyInstaller. Povernut' vruchnuyu:
+  echo        %PY% -m pip install --user pyinstaller
+  echo  [X] SBORKA PROVALENA
   pause
   exit /b 1
 )
-
+echo  PyInstaller OK.
 echo.
+
+if defined OLDWIN (
+  echo  [!] Vash Windows starshe 10. Esli sborka upadet s oshibkoj
+  echo      "api-ms-win-core-path-l1-1-0.dll" - eta Windows ne podderzhivaet
+  echo      novye Python/PyInstaller. Dva vyoda:
+  echo        1) ustanovite Python 3.9 i povtorite sborku;
+  echo        2) libo ispol'zujte PRYAMOJ ZAPUSK: start.bat
+  echo           ^(programma pojdet oknom, bez sozdaniya exe^).
+  echo.
+)
+
 echo  ======== Sobiraetsya NYBanner_PC.exe ========
 %PY% -m PyInstaller --noconfirm --clean --windowed --onefile ^
   --name NYBanner_PC ^
-  --hidden-import=PIL._tkinter_finder ^
   nybanner_pc.py
 
-if exist dist\NYBanner_PC.exe (
-  copy /y dist\NYBanner_PC.exe "%SRCDIR%NYBanner_PC.exe" >nul
+if exist "%SRCDIR%dist\NYBanner_PC.exe" (
+  copy /y "%SRCDIR%dist\NYBanner_PC.exe" "%SRCDIR%NYBanner_PC.exe" >nul
   echo.
   echo  ============================================
   echo   GOTOVO! Fail: %SRCDIR%NYBanner_PC.exe
-  echo   Zapuskat' dvoynym klikom, instaljacija ne nuzhna.
+  echo   Zapuskat' dvojnym klikom, instaljacija ne nuzhna.
   echo  ============================================
 ) else (
   echo.
   echo  [!] Sborka ne poluchilas'. Smotrite tekst vyshe.
-  echo     Chashche vsego: perezapustite skript posle ustanovki Python.
+  echo      Caushche vsego: perezapustite skript posle ustanovki Python.
+  echo  [X] SBORKA PROVALENA
 )
+
 pause
 exit /b 0

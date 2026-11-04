@@ -10,8 +10,8 @@ android {
         applicationId "com.newyear.banner"
         minSdk 21            // Android 5.0 — почти все школьные телефоны
         targetSdk 34
-        versionCode 4
-        versionName "3.1"
+        versionCode 5
+        versionName "3.2"
         // RuStore требует русскую локаль — добавляем в ресурсы (res/values-ru)
     }
 
