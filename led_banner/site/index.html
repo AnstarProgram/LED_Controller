@@ -81,9 +81,10 @@ const TAG  = "latest"; // latest — всегда последняя верси�
 //    и вставьте сюда свежие URL. Ссылки вида /XXX/ -> /download/XXX
 //    открывают файл напрямую без ожидания.
 const MIRROR = {
-  apk:      "https://tmpfiles.org/wPAVo1rdieSR/nybanner-debug.apk",   // <<< свежие ссылки
-  exe:      "https://tmpfiles.org/wCAXohriiFr6/nybanner-release.apk", // <<< для .exe подставьте свою
-  firmware: "https://tmpfiles.org/wJAioKr6ipup/nybanner_vse_v1.0.zip" // весь проект (зеркало прошивки)
+  apk:      "https://tmpfiles.org/wbAaofG86AmX/nybanner-debug.apk",    // приложение для телефона
+  release:  "https://tmpfiles.org/wqAcoHGqKEf8/nybanner-v1.0.0.apk",   // подписанный релиз (RuStore)
+  exe:      "", /* .exe ещё не собран — сгенерируйте и вставьте сюда */
+  firmware: "https://tmpfiles.org/wnAnoEG2KPgN/nybanner_vse_v1.0.zip"  // весь проект + прошивка
 };
 
 // Если GitHub ещё не настроен (логин не заменён) — основные кнопки
@@ -94,10 +95,10 @@ const base = `https://github.com/${REPO}/releases/${TAG}/download/`;
 function direct(u){ return u.replace("tmpfiles.org/", "tmpfiles.org/download/"); }
 
 document.getElementById('dl-apk').href = ghReady ? base + 'NYBanner.apk' : direct(MIRROR.apk);
-document.getElementById('dl-pc').href  = ghReady ? base + 'NYBanner-PC.zip' : direct(MIRROR.exe);
+document.getElementById('dl-pc').href  = ghReady ? base + 'NYBanner-PC.zip' : (MIRROR.exe ? direct(MIRROR.exe) : MIRROR.firmware);
 document.getElementById('dl-fw').href  = ghReady ? base + 'firmware.zip' : direct(MIRROR.firmware);
-document.getElementById('dl-apk-alt').href = direct(MIRROR.apk);
-document.getElementById('dl-pc-alt').href  = direct(MIRROR.exe);
+document.getElementById('dl-apk-alt').href = direct(MIRROR.release || MIRROR.apk);
+document.getElementById('dl-pc-alt').href  = MIRROR.exe ? direct(MIRROR.exe) : direct(MIRROR.firmware);
 document.getElementById('ghlink').href = `https://github.com/${REPO}`;
 </script>
 <p style="text-align:center;color:#8aa;font-size:13px;margin-top:14px">
