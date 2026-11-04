@@ -47,7 +47,7 @@ rem --- PyInstaller: vzyaem EGO ot TUDA ZHE, gde Python (path ne vazhen) ---
 "%PY%" -m PyInstaller --version >>"%LOG%" 2>&1
 if errorlevel 1 (
   echo  [*] Stavyu PyInstaller...
-  "%PY%" -m pip install --user pyinstaller pillow >>"%LOG%" 2>&1
+  "%PY%" -m pip install --user pyinstaller >>"%LOG%" 2>&1
 )
 "%PY%" -m PyInstaller --version >>"%LOG%" 2>&1
 if errorlevel 1 (
@@ -56,14 +56,20 @@ if errorlevel 1 (
   goto :finish 1
 )
 
+rem --- PIL ne nuzen v etoj versii; esli v koe estye - dobav import ---
+set "HIDIMP="
+
 echo  [*] Sobirayu EXE (1-3 minute)...
+>>"%LOG%" echo [*] ZAPUSK PYINSTALLER: %date% %time%
 "%PY%" -m PyInstaller --noconfirm --clean --onefile --windowed ^
-  --name NYBanner_PC --hidden-import=PIL._tkinter_finder ^
+  --name NYBanner_PC %HIDIMP% ^
   "%SRCDIR%nybanner_pc.py" >>"%LOG%" 2>&1
 set "RC=%errorlevel%"
+>>"%LOG%" echo [*] PyInstaller zavershil rabotu, kod %RC% / %time%
 if not "%RC%"=="0" (
-  >>"%LOG%" echo [!] PyInstaller verdnul kod %RC%
   echo  [!] Sborka upala (kod %RC%). Otkroyte log_build.txt - tam tekst oshibki.
+  echo      Chashche vsego: antivirus blokiruet PyInstaller - dodajte
+  echo      papku pc_app v isklyucheniya Windows Defender.
   goto :finish %RC%
 )
 

@@ -1,0 +1,19 @@
+PRO SBORKE V F:\pc_app (v3.4)
+
+1. Skachajte NOVYJ arhiv vsy.888.zip (ssylka v chate ili na sayte).
+2. Raspekujte i ZAMENITE vsje soderzhimoye papki pc_app v F:\pc_app
+   (vajno zamenit', chtoby novye build_exe.bat i start.bat).
+3. Dvoynoy klik start.bat - okno ostanetsya otkrytym i pokaet rezultat.
+   Esli GUI ne podnyalsya - smotrite log_start.txt i nybanner_error.log.
+4. Dlya sborki EXE: dvoynoy klik build_exe.bat. Vsyo pishetsya v
+   log_build.txt s otmetkami vremeni. Esli ostanovilos na "Sobirayu EXE"
+   boleye 5 minut - otkroyte log_build.txt: skoreye vsego Windows Defender
+   blokiruyet PyInstaller. Dobavte papku F:\pc_app v isklyucheniya
+   (Bezopasnost Windows -> Osnovnye parametry -> Isklyucheniya)
+   i zapustite batnik zanovo.
+
+Chto ispravleno v etoy versii:
+- Ubrana zagruzka pillow/PIL (lagala pri ustanovke i ne nuzhna).
+- PyInstaller vazyvaetsya cherez "python -m PyInstaller" (PATH ne vajen).
+- V log pishutsya vremennyye metki nachala i kontsa sborki.
+- Okna batnikov nikogda ne zakryvayutsya sami (pause vsegda v kontse).
