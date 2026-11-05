@@ -1,0 +1,14 @@
+build/
+.gradle/
+*.class
+*.dex
+*.jar
+*.apk
+*.ap_
+*.prof
+*.profm
+*.bin
+*.lock
+*.flat
+*.dm
+*.log

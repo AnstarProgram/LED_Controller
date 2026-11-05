@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_next" android:title="@string/menu_next" app:showAsAction="never" />
+    <item android:id="@+id/menu_prev" android:title="@string/menu_prev" app:showAsAction="never" />
+    <item android:id="@+id/menu_save" android:title="@string/menu_save" app:showAsAction="never" />
+    <item android:id="@+id/menu_reboot" android:title="@string/menu_reboot" app:showAsAction="never" />
+</menu>

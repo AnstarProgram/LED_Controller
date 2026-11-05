@@ -1,0 +1,40 @@
+NYBanner v3.2 — новогодняя LED-лента (ESP32 + 3 панели 8x32)
+=============================================================
+
+ЧТО В АРХИВЕ:
+
+1. pc_app\  — программа для ПК v3.2 (3 режима: блоки Scratch / редактор / прямой код)
+   • build_exe.bat      — ДВОЙНОЙ КЛИК на Windows, соберёт NYBanner_PC.exe.
+                          ИСПРАВЛЕНА ОШИБКА "pyinstaller не является командой":
+                          теперь вызов идёт через "python -m PyInstaller" и папка
+                          Roaming\Python\Scripts больше не обязана быть в PATH.
+                          Работает от F:\pc_app (и из любой другой папки).
+   • start.bat          — НОВОЕ: запуск программы СРАЗУ через Python, без сборки exe.
+                          Если с exe проблемы — просто пользуйтесь start.bat.
+   • README_Windows.txt — пошаговое объяснение ошибок и решений.
+
+2. esp32_web\index.html — САЙТ №2: панель управления лентой из браузера.
+   Вход БЕЗ PIN-кода кнопкой «Войти» (PIN теперь опционален), либо по коду.
+
+3. site\index.html      — САЙТ №1: витрина скачивания APK / EXE / прошивки,
+   современные ссылки на onlyfiles.com.
+
+4. firmware_esp32\      — прошивка ESP32 v3.0+ (открыть .ino в Arduino IDE).
+   PIN по умолчанию выключен (0000 = открытый доступ), команда "PIN 1234" включает.
+
+5. android\             — исходники Android v3.2 (versionCode 5).
+6. NYBanner-debug.apk / NYBanner-release.apk — готовые приложения.
+
+ЕСЛИ ЧТО-ТО НЕ ЗАПУСКАЕТСЯ: сначала пробуйте start.bat (ПК) или сайт esp32_web
+(управление лентой вообще без установки программ).
+
+
+=== V3.3 (ot 04.11.2026) ===
+ISPRAVLENO: bat-faily bolshe NI KOGDA ne zakryvayutsya sami - vsegda zhdayut klavishu
+i pishut polnyj zhurnal: pc_app/log_start.txt i pc_app/log_build.txt.
+Sborka EXE cherez "python -m PyInstaller" (bez zavisimosti ot PATH).
+Programma PC pri fatalnoj oshibke pokazyvaet okno s tekstom i pishet nybanner_error.log.
+Novye ssylki (onlyfiles, zhivut neskolko dnej):
+  vsy.777.zip : https://onlyfiles.com/wXw8wRo33Xja/vsy.777.zip
+  debug.apk   : https://onlyfiles.com/wDw2who73jaj/nybanner-debug.apk
+  release.apk : https://onlyfiles.com/wLw1wOoS30vL/nybanner-release.apk
